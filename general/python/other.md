@@ -15,3 +15,8 @@ requests.get("http://example.org", proxies=proxies)
 sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py kali .
 ```
 
+# smb2 with password
+
+```
+sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py -smb2support -username username -password password kali .
+```

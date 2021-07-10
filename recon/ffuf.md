@@ -21,5 +21,11 @@ ffuf -c -u "http://$rhost$rport/FUZZ" -w /usr/share/seclists/Discovery/Web-Conte
 ## vhost
 
 ```
-ffuf -c -u "http://$rhost$rport" -w pot-vhosts.txt -o ffuf-vhost-$rhost.txt -od ffuf-vhost-$rhost -H "Host: FUZZ.$rhost" -fs <filter size>"
+ffuf -c -u "http://$rhost$rport" -w pot-vhosts.txt -o ffuf-vhost-$rhost.txt -od ffuf-vhost-$rhost -H "Host: FUZZ.$rhost" -fs <filter size>
+```
+
+## all improved
+
+```bash
+output="http-80"; ffuf -c -u "http://$rhost/FUZZ" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o "ffuf-$output.txt" -recursion -e ".htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp" -od "ffuf-$output" -mc "200,204,301,302,307,401,405,403"
 ```

