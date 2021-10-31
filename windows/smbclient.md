@@ -1,18 +1,18 @@
 # list shares
 
-```
+```bash
 smbclient -L <computer-name/ip>
 ```
 
 # connect as anonymous (dont ask for pw)
 
-```
+```bash
 smbclient -N //"$rhost"/SomeDir
 ```
 
 # connect as guest
 
-```
+```bash
 smbclient -U guest //"$rhost"/SomeDir
 ```
 
