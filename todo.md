@@ -1,0 +1,6 @@
+
+# listing ports
+
+```
+netstat -a
+```
