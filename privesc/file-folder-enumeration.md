@@ -68,3 +68,9 @@ gci -force -recurse -filter regex* -ErrorAction SilentlyContinue
 ```cmd
 dir <file*> /S /B
 ```
+
+## files for automating windows installations
+
+```cmd
+dir /s *sysprep.inf *sysprep.xml *unattended.xml *unattend.xml *unattend.txt 2>nul
+```
