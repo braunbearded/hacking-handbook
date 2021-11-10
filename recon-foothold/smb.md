@@ -40,7 +40,7 @@ smbclient -N //"$rhost"/SomeDir
 smbclient -U guest //"$rhost"/SomeDir
 ```
 
-### recursive download files via smbclient
+### recursive download files via smbclient version 1
 
 1. connect
 2. cd folder
@@ -48,6 +48,12 @@ smbclient -U guest //"$rhost"/SomeDir
 4. type: recurse
 5. type: prompt
 6. mget *
+
+### recursive download files via smbclient version 2
+
+```bash
+smbclient "\\$rhost\share" -N -c 'prompt OFF;recurse ON;cd 'path\to\directory\';lcd '~/path/to/download/to/';mget *'`
+```
 
 ## crackmapexec
 
