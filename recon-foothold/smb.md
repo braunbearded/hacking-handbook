@@ -2,13 +2,15 @@
 
 ## smbmap
 
-### login as guest to host
+### list smb shares as guest/nobody to host
 
 ```bash
 smbmap -u guest -H "$rhost"
+smbmap -u '' -p '' -H "$rhost"
+smbmap -u 'nobody' -p '' -H "$rhost"
 ```
 
-### login as anonymous to host
+### list smb shares as anonymous to host
 
 ```bash
 smbmap -H "$rhost"
@@ -60,6 +62,7 @@ smbclient "\\$rhost\share" -N -c 'prompt OFF;recurse ON;cd 'path\to\directory\';
 ### bruteforce smb shares
 
 ```bash
+crackmapexec smb $rhost -u pot-user.txt -p pot-passwords.txt --continue-on-success
 crackmapexec smb $rhost -u pot-user.txt -p pot-passwords.txt
 ```
 
@@ -75,4 +78,16 @@ smbget -R smb://<rhost>/<share> -U Anonymous
 
 ```bash
 smbget -R smb://<rhost>/share/ -U <User>%<Password>
+```
+
+## nmap 
+
+```bash
+nmap --script "safe or smb-enum-*" -p 445 "$rhost"
+```
+
+## psexec
+
+```bash
+python3 /usr/share/doc/python3-impacket/examples/psexec.py <user>:'<password>'@"$rhost" whoami
 ```

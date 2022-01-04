@@ -7,8 +7,8 @@
 #include <stdio.h>
 
 void test_this() {
-        printf("Function test_this is running!\n");
-        setgid(0);
-        setuid(0);
-        execl("/bin/sh","sh",0);
+    printf("Function test_this is running!\n");
+    setgid(0);
+    setuid(0);
+    execl("/bin/sh","sh",0);
 }

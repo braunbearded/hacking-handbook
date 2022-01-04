@@ -1,3 +1,0 @@
-# decompiling .net
-
-* ilspy

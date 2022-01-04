@@ -15,7 +15,7 @@ Listen on local port on server and forward it to remote host on remote port
 # listen on server port 135 and forward packets to client on port 9999
 
 ```
-chisel.exe client 10.9.133.175:1337 R:135:localhost:9999
+chisel.exe client so.me.i.p:1337 R:135:localhost:9999
 ```
 
 # start server

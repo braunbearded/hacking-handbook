@@ -1,4 +1,4 @@
-# linux victim
+# Linux victim
 
 ## find set group/user bit files
 
@@ -7,13 +7,19 @@ find / -perm -u=s -type f 2> /dev/null
 find / -perm -g=s -type f 2> /dev/null
 ```
 
+## find files which are accessable by some-group
+
+```bash
+find / -group some-group 2> /dev/null
+```
+
 ## search thru all binary with strings and grep
 
 ```bash
 find . -type f | xargs strings | grep -i "passwo"
 ```
 
-## list files which are modifyed by user
+## list files which are modified by user
 
 ```bash
 ls -lt --time-style=full-iso | grep -v "000000000"
@@ -63,7 +69,7 @@ gci -Force
 gci -force -recurse -filter regex* -ErrorAction SilentlyContinue
 ```
 
-## list folders (recursivly)
+## list folders (recursively)
 
 ```cmd
 dir <file*> /S /B

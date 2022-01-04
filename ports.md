@@ -2,6 +2,7 @@
 
 |proto  |port   |discription                             |
 |-------|-------|----------------------------------------|
+|       |25     |SMTP (mail)                             |
 |       |53     |DNS                                     |
 |       |88     |Kerberos                                |
 |       |135    |MS EPMAP                                |
@@ -10,6 +11,7 @@
 |UDP    |162    |SNMP (Manager notifications)            |
 |       |389    |LDAP                                    |
 |       |445    |SMB                                     |
+|       |465    |SMTPS (mail)                            |
 |       |636    |LDAPS                                   |
 |       |3268   |LDAPS                                   |
 |       |3269   |LDAPS                                   |

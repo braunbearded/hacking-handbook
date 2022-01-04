@@ -4,6 +4,11 @@
 - msfconsole search for technologies used
 - search for alternatives to programs
 
+# bruteforce/discovery
+
+- create custom wordlists with stuff like users, shares, company jargon
+- bruteforce/discover every service with your custom wordlist
+
 # webservers
 
 - urlencode your shit
@@ -19,3 +24,6 @@
     - X-Forwarded-For: 127.0.0.1
     - X-Remote-IP: 127.0.0.1
     - X-Remote-Addr: 127.0.0.1
+- bruteforce
+    - username (with login form)
+    - virtual hosts
