@@ -15,7 +15,7 @@ rustscan -a "$rhost" -- -A -sC -sV -sS -sU --osscan-guess --version-all | tee ru
 ## full port scan (udp and tcp) + save nmap output
 
 ```bash
-rustscan -a "$rhost" -- -A -sC -sV -sS -sU --osscan-guess --version-all -oA nmapscan | tee rustscan-$rhost.txt
+mkdir -p nmap-$rhost && rustscan -a "$rhost" -- -A -sC -sV -sS -sU --osscan-guess --version-all -oA nmap-$rhost/fullscan
 ```
 
 ## searchsploit with nmap scan
