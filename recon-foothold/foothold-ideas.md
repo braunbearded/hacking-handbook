@@ -9,6 +9,10 @@
 - create custom wordlists with stuff like users, shares, company jargon
 - bruteforce/discover every service with your custom wordlist
 
+# shares/ftp
+
+- check folders(names) in ftp/samba also on webservers or other services
+
 # webservers
 
 - urlencode your shit
