@@ -7,3 +7,7 @@ the url befor *:username*. Text for failed login attempt can be set after
 ```bash
 hydra -l <username> -P /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt "$rhost" http-post-form "/:username=^USER^&password=^PASS^:F=incorrect"
 ```
+
+# use zap
+
+Install fuzzer from Zap Marketplace. Right click request -> Attach -> Fuzz..
