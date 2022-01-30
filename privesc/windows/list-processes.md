@@ -1,12 +1,4 @@
-# linux victim
-
-## check frequently running processes
-
-* pspy
-
-# windows victim
-
-## list running processes with username
+# list running processes with username
 
 Requires admin permission:
 
