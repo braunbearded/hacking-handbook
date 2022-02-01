@@ -1,12 +1,14 @@
+# windows stuff
+
+- https://www.hackingarticles.in/a-little-guide-to-smb-enumeration/
+- https://0xdf.gitlab.io/2018/12/02/pwk-notes-smb-enumeration-checklist-update1.html#smbmap
+- nmblookup -A "$rhost"
+
 # wordlist
 
 ## check tool
 
-html2dic
-https://github.com/D4Vinci/CWFF
-https://github.com/shellhunter/gocewl
-https://github.com/Zarcolio/wwwordlist
-https://github.com/hakluke/haklistgen
+- html2dic
 
 ## python implementation?
 
