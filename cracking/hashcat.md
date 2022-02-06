@@ -50,3 +50,9 @@ hashcat -O -a 0 -m 5600 ntlm.hash /usr/share/seclists/Passwords/Leaked-Databases
 # show cracked passwords
 
 add option `--show` to previous command
+
+# generate wordlist based on word with ruleset
+
+```bash
+echo "someword" | hashcat -r /usr/share/hashcat/rules/best64.rule --stdout > passwords
+```
