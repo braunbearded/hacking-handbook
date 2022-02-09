@@ -1,5 +1,13 @@
 # winrm
 
+Crackmapexec cant provide an interactive shell by itself
+
+## interactive shell with evil-winrm
+
+```bash
+evil-winrm -i "$rhost" -u "user" -p "password"
+```
+
 ## check connection
 
 ```bash

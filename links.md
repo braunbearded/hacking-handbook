@@ -31,8 +31,12 @@
 - https://github.com/CISOfy/lynis
 - https://github.com/mostaphabahadou/postenum
 - https://github.com/PowerShellMafia/PowerSploit
+- https://github.com/Greenwolf/ntlm_theft
+- !!! https://github.com/nomi-sec/PoC-in-GitHub
 
 # TODO
+
+- https://github.com/bitsadmin/wesng
 
 - https://github.com/microsoft/AttackSurfaceAnalyzer
 - https://github.com/411Hall/JAWS

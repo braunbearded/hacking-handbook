@@ -4,4 +4,8 @@
 
 # decompiling .net
 
-* ilspy
+- ilspy
+
+# check syscall
+
+run binary with ltrace
