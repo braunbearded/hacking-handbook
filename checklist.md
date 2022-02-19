@@ -16,9 +16,10 @@
 
 4. general
   1. did you check hacking tricks for ports?
+  99. check https://github.com/nomi-sec/PoC-in-GitHub
 
 5. web server
-  1. Does the respect vhost?
+  1. Does the server respect vhosts?
     1. Bruteforce common sub domains
     2. content discovery for every vhost
   2. Check ssl certificate 
@@ -59,7 +60,8 @@
   1. Check printnightmare
 4. check ethernalblue -> autoblue
 5. can you upload files?
-  1. some file types allows to caputure hashes -> ntlm_theft
+  1. some file types allows to capture hashes -> ntlm_theft
+6. check https://github.com/SecWiki/windows-kernel-exploits
 
 # linux privesc
 
@@ -80,4 +82,7 @@
 3. check version: cmd /c ver
 4. run wesng
 5. run winPEAS
+6. check https://github.com/SecWiki/windows-kernel-exploits
+98. check https://book.hacktricks.xyz/windows/windows-local-privilege-escalation
 99. check https://github.com/swisskyrepo/PayloadsAllTheThings/blob/master/Methodology%20and%20Resources/Windows%20-%20Privilege%20Escalation.md
+
