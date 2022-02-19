@@ -5,7 +5,12 @@
 - https://github.com/samratashok/nishang
 - https://github.com/ivan-sincek/php-reverse-shell
 
-# Binarys
+# Popular binarys for privesc
+
+- https://gtfobins.github.io/
+- https://lolbas-project.github.io/
+
+# Tools and other stuff
 
 - https://github.com/jpillora/chisel
 - https://github.com/gentilkiwi/mimikatz
@@ -15,14 +20,6 @@
 - https://docs.microsoft.com/de-de/sysinternals/downloads/sysinternals-suite
 - https://github.com/DominicBreuker/pspy.git
 - https://github.com/diegocr/netcat
-
-# Popular binarys for privesc
-
-- https://gtfobins.github.io/
-- https://lolbas-project.github.io/
-
-# Other
-
 - https://github.com/FireFart/dirtycow
 - https://github.com/dirkjanm/krbrelayx
 - https://github.com/rebootuser/LinEnum
@@ -33,10 +30,11 @@
 - https://github.com/PowerShellMafia/PowerSploit
 - https://github.com/Greenwolf/ntlm_theft
 - !!! https://github.com/nomi-sec/PoC-in-GitHub
+- https://github.com/SecWiki/windows-kernel-exploits
+- https://github.com/bitsadmin/wesng
+- https://github.com/itm4n/PrivescCheck
 
 # TODO
-
-- https://github.com/bitsadmin/wesng
 
 - https://github.com/microsoft/AttackSurfaceAnalyzer
 - https://github.com/411Hall/JAWS
@@ -53,3 +51,4 @@
 - https://github.com/kootenpv/gittyleaks
 - https://github.com/Kevin-Robertson/Invoke-TheHash
 - https://github.com/quantumcore/remote_hacker_probe
+
