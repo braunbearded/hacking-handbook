@@ -74,6 +74,7 @@
   1. Files in sudo -l
   2. /etc/passwd or /etc/shadow
   3. Binarys 
+7. Are there core dumps? check /var/crash. Can you otherwise extract data in memory?
 6. su with previously found credentials
 
 # windows privesc
