@@ -4,8 +4,14 @@
 python3 -m venv some_name
 ```
 
-# activate env
+# activate venv
 
 ```bash
 source some_name/bin/activate
+```
+
+# exit venv
+
+```bash
+deactivate
 ```
