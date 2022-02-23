@@ -23,5 +23,12 @@ ffuf -c -u "http://$rhost$rport/FUZZ" -w /usr/share/seclists/Discovery/Web-Conte
 ### all improved
 
 ```bash
-ffuf_out="ffuf-http-80"; ffuf -c -u "http://$rhost/FUZZ" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o "$ffuf_out/summary.txt" -recursion -e ".htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp" -od "$ffuf_out" -mc "200,204,301,302,307,401,405,403"
+ffuf_out="ffuf-http-80"; ffuf -c -u "http://$rhost/FUZZ" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o "$ffuf_out/summary.json" -recursion -e ".htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp" -od "$ffuf_out" -mc "200,204,301,302,307,401,405,403" -H "Host: $rhost"
+```
+
+### analyze summary
+
+```bash
+cd into/fuff-result
+jq -r '.results[] | [.status, .url, .resultfile] | @tsv' summary.txt | grep -v "^403"
 ```
