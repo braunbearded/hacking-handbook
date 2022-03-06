@@ -76,6 +76,9 @@
   3. Binarys 
 7. Are there core dumps? check /var/crash. Can you otherwise extract data in memory?
 6. su with previously found credentials
+8. Which processes are running under high privileged user?
+  1. Are they vulnerable/outdated? -> Google version
+  2. Can you exploit it ? check hacking-tricks and exploitdb
 
 # windows privesc
 1. check priv: whoami /priv
