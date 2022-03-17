@@ -48,6 +48,8 @@
   16. Are there predictable ids?
   17. Can you upload data ? Deserialzation, XXE
   18. Is it connected to any other service on the server?
+  19. Is there any form of redirect available? -> enum localhost, bypass authentication (jwt)
+  20. Did you check your cookies ? Can you decode them ? JWT
   19. content discovery with custom wordlist
 
 # windows
