@@ -12,11 +12,12 @@ Users to check:
 
 ```bash
 ftp $rhost
+ftp "user@$rhost"
 ```
 
-## improved ftp
+## download all ftp files
 
 ```bash
 lftp -u <user> $rhost
-mget * # download all files
+mirror # download all files
 ```
