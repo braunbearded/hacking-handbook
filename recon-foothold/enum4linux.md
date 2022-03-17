@@ -1,17 +1,33 @@
-# enum4linux with empty user and password
+# enum4linux (old)
+
+## enumerate with empty user and password
 
 ```bash
 enum4linux -a -u "" -p "" "$rhost"
 ```
 
-# enum4linux with guest account
+## enumerate with guest account
 
 ```bash
 enum4linux -a -u "guest" -p "" "$rhost"
 ```
 
-# enum4linux as guest with all options
+## enumerate as guest with all options
 
 ```bash
 enum4linux -U -M -S -P -G -d -a -r -l -o -i "$rhost"
+```
+
+# enum4line4linux-ng
+
+## fast
+
+```bash
+enum4line4linux-ng.py "$rhost"
+```
+
+## extensive and detailed
+
+```bash
+enum4line4linux-ng.py -A -Gm -C -R -d "$rhost"
 ```
