@@ -29,6 +29,7 @@
   6. Do you know what programming language was used?
   7. Does it have a backend ?
   8. Does it connect to a database? If so which ? -> SQL injection, NOSQL injection
+    1. Check with sqlmap
   9. Is a popular CMS used?
     1. use cms scanner (wpcan)
     2. searchsploit theme, plugin and cms version
