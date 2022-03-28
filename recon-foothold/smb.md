@@ -8,6 +8,8 @@
 smbmap -u guest -H "$rhost"
 smbmap -u '' -p '' -H "$rhost"
 smbmap -u 'nobody' -p '' -H "$rhost"
+smbmap -u 'anonymous' -p '' -H "$rhost"
+smbmap -u 'null' -p '' -H "$rhost"
 ```
 
 ### list smb shares as anonymous to host
@@ -90,4 +92,12 @@ nmap --script "safe or smb-enum-*" -p 445 "$rhost"
 
 ```bash
 python3 /usr/share/doc/python3-impacket/examples/psexec.py <user>:'<password>'@"$rhost" whoami
+```
+
+## lookupsid
+
+extract username via sid enumeration
+
+```bash
+impacket-lookupsid anonymous@"$rhost"
 ```
