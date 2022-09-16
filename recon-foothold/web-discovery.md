@@ -32,3 +32,9 @@ ffuf_out="ffuf-http-80"; ffuf -c -u "http://$rhost/FUZZ" -w /usr/share/seclists/
 cd into/fuff-result
 jq -r '.results[] | [.status, .url, .resultfile] | @tsv' summary.txt | grep -v "^403"
 ```
+
+### http with request file
+
+```bash
+ffuf -c -request file.req -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -request-proto http
+```

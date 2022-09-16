@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 import http.server as SimpleHTTPServer
 import socketserver as SocketServer
 import logging
