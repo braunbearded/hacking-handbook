@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 
 # https://gist.githubusercontent.com/liba2k/d522b4f20632c4581af728b286028f8f/raw/44beb9ac6cfbdbe711ee60e35146c6253c3de9bf/ghidra.py
 

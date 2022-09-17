@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 file = "exploit.txt"
 
 def print_hex_chars():

