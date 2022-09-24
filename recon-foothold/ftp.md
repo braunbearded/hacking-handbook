@@ -21,3 +21,10 @@ ftp "user@$rhost"
 lftp -u <user> $rhost
 mirror # download all files
 ```
+
+## download with active/passiv mode
+
+```bash
+lftp ftp://<user>@"$rhost"
+set ftp:passive-mode off
+```

