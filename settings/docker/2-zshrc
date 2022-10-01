@@ -1,0 +1,160 @@
+#WORDCHARS=${WORDCHARS//\/} # Don't consider certain characters part of the word
+#
+## hide EOL sign ('%')
+#export PROMPT_EOL_MARK=""
+#
+#
+## make less more friendly for non-text input files, see lesspipe(1)
+##[ -x /usr/bin/lesspipe ] && eval "$(SHELL=/bin/sh lesspipe)"
+#
+#	ZSH_HIGHLIGHT_HIGHLIGHTERS=(main brackets pattern)
+#	ZSH_HIGHLIGHT_STYLES[default]=none
+#	ZSH_HIGHLIGHT_STYLES[unknown-token]=fg=red,bold
+#	ZSH_HIGHLIGHT_STYLES[reserved-word]=fg=cyan,bold
+#	ZSH_HIGHLIGHT_STYLES[suffix-alias]=fg=green,underline
+#	ZSH_HIGHLIGHT_STYLES[global-alias]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[precommand]=fg=green,underline
+#	ZSH_HIGHLIGHT_STYLES[commandseparator]=fg=blue,bold
+#	ZSH_HIGHLIGHT_STYLES[autodirectory]=fg=green,underline
+#	ZSH_HIGHLIGHT_STYLES[path]=underline
+#	ZSH_HIGHLIGHT_STYLES[path_pathseparator]=
+#	ZSH_HIGHLIGHT_STYLES[path_prefix_pathseparator]=
+#	ZSH_HIGHLIGHT_STYLES[globbing]=fg=blue,bold
+#	ZSH_HIGHLIGHT_STYLES[history-expansion]=fg=blue,bold
+#	ZSH_HIGHLIGHT_STYLES[command-substitution]=none
+#	ZSH_HIGHLIGHT_STYLES[command-substitution-delimiter]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[process-substitution]=none
+#	ZSH_HIGHLIGHT_STYLES[process-substitution-delimiter]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[single-hyphen-option]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[double-hyphen-option]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[back-quoted-argument]=none
+#	ZSH_HIGHLIGHT_STYLES[back-quoted-argument-delimiter]=fg=blue,bold
+#	ZSH_HIGHLIGHT_STYLES[single-quoted-argument]=fg=yellow
+#	ZSH_HIGHLIGHT_STYLES[double-quoted-argument]=fg=yellow
+#	ZSH_HIGHLIGHT_STYLES[dollar-quoted-argument]=fg=yellow
+#	ZSH_HIGHLIGHT_STYLES[rc-quote]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[dollar-double-quoted-argument]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[back-double-quoted-argument]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[back-dollar-quoted-argument]=fg=magenta
+#	ZSH_HIGHLIGHT_STYLES[assign]=none
+#	ZSH_HIGHLIGHT_STYLES[redirection]=fg=blue,bold
+#	ZSH_HIGHLIGHT_STYLES[comment]=fg=black,bold
+#	ZSH_HIGHLIGHT_STYLES[named-fd]=none
+#	ZSH_HIGHLIGHT_STYLES[numeric-fd]=none
+#	ZSH_HIGHLIGHT_STYLES[arg0]=fg=green
+#	ZSH_HIGHLIGHT_STYLES[bracket-error]=fg=red,bold
+#	ZSH_HIGHLIGHT_STYLES[bracket-level-1]=fg=blue,bold
+#	ZSH_HIGHLIGHT_STYLES[bracket-level-2]=fg=green,bold
+#	ZSH_HIGHLIGHT_STYLES[bracket-level-3]=fg=magenta,bold
+#	ZSH_HIGHLIGHT_STYLES[bracket-level-4]=fg=yellow,bold
+#	ZSH_HIGHLIGHT_STYLES[bracket-level-5]=fg=cyan,bold
+#	ZSH_HIGHLIGHT_STYLES[cursor-matchingbracket]=standout
+#
+#unset color_prompt force_color_prompt
+
+{
+  # Compile the completion dump to increase startup speed.
+  zcompdump="${ZDOTDIR:-$HOME}/.zcompdump"
+  if [[ -s "$zcompdump" && (! -s "${zcompdump}.zwc" || "$zcompdump" -nt "${zcompdump}.zwc") ]]; then
+    zcompile "$zcompdump"
+  fi
+} &!
+
+autoload -Uz compinit
+compinit -d ~/.cache/zcompdump
+
+setopt APPEND_HISTORY
+#setopt correct            # auto correct mistakes
+setopt COMPLETE_ALIASES
+setopt EXTENDED_HISTORY
+setopt HIST_FIND_NO_DUPS
+setopt HIST_IGNORE_ALL_DUPS
+setopt HIST_IGNORE_DUPS
+setopt HIST_IGNORE_SPACE      # ignore commands that start with space
+setopt HIST_REDUCE_BLANKS
+setopt HIST_SAVE_NO_DUPS
+setopt hist_verify            # show command with history expansion to user before running it
+#setopt INC_APPEND_HISTORY
+setopt PROMPT_SUBST
+setopt SHARE_HISTORY
+setopt always_to_end
+setopt autocd              # change directory just by typing its name
+setopt autopushd
+setopt clobber
+setopt complete_in_word
+setopt extendedglob
+setopt globdots
+setopt hist_verify
+setopt interactivecomments # allow comments in interactive mode
+unsetopt ksharrays           # arrays start at 0
+setopt magicequalsubst     # enable filename expansion for arguments of the form ‘anything=expression’
+setopt nonomatch           # hide error message if there is no match for the pattern
+setopt notify              # report the status of background jobs immediately
+setopt numericglobsort     # sort filenames numerically when it makes sense
+setopt pushdignoredups
+unsetopt HIST_EXPIRE_DUPS_FIRST
+unsetopt correct
+unsetopt correct_all
+unsetopt flowcontrol
+
+zstyle ':completion:*' rehash true
+zstyle ':completion:*' accept-exact '*(N)'
+#zstyle ':completion:*' use-cache on
+zstyle ':completion:*:*:*:*:*' menu select
+zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}'
+zstyle ':completion:*' list-colors ${(s.:.)LS_COLORS}
+zstyle ':completion::complete:*' gain-privileges 1
+#zstyle ':completion:*:*:*:*:*' menu select
+#zstyle ':completion:*' matcher-list 'm:{a-zA-Z}={A-Za-z}' # case insensitive tab completion
+#    zstyle ':completion:*' list-colors "${(s.:.)LS_COLORS}"
+
+# show git status in prompt
+autoload -Uz vcs_info colors && colors
+precmd() {
+    vcs_info
+}
+zstyle ':vcs_info:*' check-for-changes true
+zstyle ':vcs_info:*' unstagedstr '!'
+zstyle ':vcs_info:*' stagedstr '+'
+zstyle ':vcs_info:git*+set-message:*' hooks git-untracked
+zstyle ':vcs_info:git:*' formats " %{$fg_no_bold[white]%}(%{$fg_bold[magenta]%}%b%{$fg_no_bold[white]%}%{$fg_bold[cyan]%}%u%c%m%{$fg_no_bold[white]%})"
+
++vi-git-untracked() {
+  if [[ $(git rev-parse --is-inside-work-tree 2> /dev/null) == 'true' ]] && \
+     git status --porcelain | grep -m 1 '^??' &>/dev/null
+  then
+    hook_com[misc]='?'
+  fi
+}
+
+bindkey "^?"        backward-delete-char
+bindkey "^[[H"      beginning-of-line
+bindkey "^[[F"      end-of-line
+bindkey "^[[3~"     delete-char
+#bindkey -e                                        # emacs key bindings
+#bindkey ' ' magic-space                           # do history expansion on space
+#bindkey '^[[3;5~' kill-word                       # ctrl + Supr
+#bindkey '^[[1;5C' forward-word                    # ctrl + ->
+#bindkey '^[[C' forward-word                       # ctrl + ->
+#bindkey '^[[1;5D' backward-word                   # ctrl + <-
+#bindkey '^[[D' backward-word                      # ctrl + <-
+#bindkey '^[[5~' beginning-of-buffer-or-history    # page up
+#bindkey '^[[6~' end-of-buffer-or-history          # page down
+#bindkey '^[[Z' undo                               # shift + tab undo last action
+
+
+PROMPT='%{$fg_no_bold[red]%}[%{$fg_bold[yellow]%}%n%{$fg_no_bold[white]%}@%{$fg_bold[blue]%}%m %F{green}%3~${vcs_info_msg_0_}%{$fg_no_bold[red]%}]%{$fg_no_bold[white]%}%(#.#.$) '
+
+# run ls after dir changed
+function chpwd() {
+    emulate -L zsh
+    lsd
+}
+
+[ -f /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh ] \
+    && source /usr/share/zsh-autosuggestions/zsh-autosuggestions.zsh
+[ -f "/usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] \
+    && source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+[ -f "/usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh" ] \
+    && source /usr/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+

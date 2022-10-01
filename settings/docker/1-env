@@ -1,0 +1,24 @@
+#!/bin/sh
+
+export TERM=xterm-256color
+export TMPDIR=/tmp
+export FAKETIME="+1h"
+export EDITOR="/usr/bin/nvim"
+export NMAP_PRIVILEGED=""
+export _JAVA_AWT_WM_NONREPARENTING=1 # needed for java gui programs
+export HISTFILE=~/hack/history/shell-hist
+export HISTSIZE=999999
+export SAVEHIST=10000
+export HISTTIMEFORMAT='%F %T '
+export LANG=en_US.UTF-8  
+export LANGUAGE=en_US:en  
+export LC_ALL=en_US.UTF-8
+export PATH="$PATH:/home/kali/.local/bin"
+#    export LESS_TERMCAP_mb=$'\E[1;31m'     # begin blink
+#    export LESS_TERMCAP_md=$'\E[1;36m'     # begin bold
+#    export LESS_TERMCAP_me=$'\E[0m'        # reset bold/blink
+#    export LESS_TERMCAP_so=$'\E[01;33m'    # begin reverse video
+#    export LESS_TERMCAP_se=$'\E[0m'        # reset reverse video
+#    export LESS_TERMCAP_us=$'\E[1;32m'     # begin underline
+#    export LESS_TERMCAP_ue=$'\E[0m'        # reset underline
+

