@@ -1,0 +1,4 @@
+# get dc
+nslookup
+set type=all
+_ldap._tcp.dc._msdcs.some.domain

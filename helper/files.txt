@@ -1,0 +1,4 @@
+/opt/repos/netcat/nc.exe
+/opt/repos/LinEnum/LinEnum.sh
+/opt/repos/nishang/Shells/Invoke-PowerShellTcp.ps1
+/opt/repos/PowerSploit/Recon/PowerView.ps1

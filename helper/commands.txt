@@ -1,0 +1,51 @@
+aff                      # analyse summary.json in current dir
+bashrev                  # print bash reverse shell
+bh                       # start neo4j and bloodhound
+burpsuite               
+cef                      # copy external files
+chi                      # start chisel connection
+crh                      # crack hash
+cssh                     # no host checking
+dcu                      # generate download command for files in current dir
+dcus                     # generate download command for files in current dir and filter with fzf
+dur                      # url decode
+e                        # open nvim
+eco                      # read string vom stdin; edit in $EDITOR; run 
+eeh                      # edit /etc/hosts
+ehi                      # edit command from history and run
+enumsmb                  # enumerate smb server
+eur                      # url encode
+eurs                     # url encode with slash
+f                        # open ranger
+ff                       # open firefox
+ffr                      # ffuf with request file
+ffv                      # default vhost discovery
+ffw                      # default web discovery
+ftpserver                # python ftpserver
+genssh                   # generate ssh keys
+ghi                      # analyse binary in background with ghidra
+interfaceip              # get main interface ip
+lsa                      # long listing
+md                       # mkdir with parent
+msfc                     # start msfconsole with postgres
+ncl                      # netcat listen
+nik                      # nikto scan
+pel                      # print linux commands for enumeration
+pew                      # print windows commands for enumeration
+phpwebsh                 # print php webshell
+pst                      # tcp rustscan
+psu                      # udp rustscan
+pve                      # create and switch to python virtual env
+rrm                      # rm recursively
+sco                      # show this list
+share                    # start python webserver
+shb                      # search in hacking handbook
+smbserver                # start impacket smbserver
+sp                       # searchsploit with fzf
+srh                      # export rhost
+ssmbserver               # start secure (password) impacket smbserver
+update_external_tools    # update external tools in /opt/external
+update_repos             # update repos in /opt/repos
+vnc_start               
+vnc_stop                
+zaproxy                  # open zaproxy
