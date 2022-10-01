@@ -22,6 +22,12 @@ Long password will be ignored with -O flag!
 hashcat -O -a 0 -m 0 -r /usr/share/hashcat/rules/best64.rule hash.hash /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt
 ```
 
+# crack hash with multiple rule sets
+
+```bash
+hashcat -m 17210 -r append-digits.txt -r append-digits.txt -r append-digits.txt -r append-digits.txt -r append-special.txt hash.hash wordlist.txt
+```
+
 # crack ntlm with wordlist
 
 Long password will be ignored with -O flag!
