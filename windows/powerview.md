@@ -1,0 +1,3 @@
+# check gpos
+
+get-netgpo

