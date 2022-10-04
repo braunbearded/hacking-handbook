@@ -1,0 +1,15 @@
+https://github.com/swisskyrepo/PayloadsAllTheThings.git /opt/repos/PayloadsAllTheThings
+https://github.com/samratashok/nishang.git /opt/repos/nishang
+https://github.com/FireFart/dirtycow.git /opt/repos/dirtycow
+https://github.com/dirkjanm/krbrelayx.git /opt/repos/krbrelayx
+https://github.com/rebootuser/LinEnum.git /opt/repos/LinEnum
+https://github.com/mzet-/linux-exploit-suggester.git /opt/repos/linux-exploit-suggester
+https://github.com/diego-treitos/linux-smart-enumeration.git /opt/repos/linux-smart-enumeration
+https://github.com/CISOfy/lynis.git /opt/repos/lynis
+https://github.com/ivan-sincek/php-reverse-shell.git /opt/repos/php-reverse-shell
+https://github.com/mostaphabahadou/postenum.git /opt/repos/postenum
+https://github.com/PowerShellMafia/PowerSploit.git /opt/repos/PowerSploit
+https://github.com/diegocr/netcat.git /opt/repos/netcat
+https://github.com/Greenwolf/ntlm_theft /opt/repos/ntlm_theft
+https://github.com/bitsadmin/wesng /opt/repos/wesng
+
