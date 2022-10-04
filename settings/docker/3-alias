@@ -19,6 +19,7 @@ alias ftpserver="/home/kali/hhb/helper/ftpserver.sh"
 alias share="/home/kali/hhb/helper/webserver.py"
 alias pel="cat /home/kali/hhb/helper/ollinux.txt"
 alias pew="cat /home/kali/hhb/helper/ol-win-local.txt"
+alias sudo='sudo '
 
 # Edit COmmand
 eco() {

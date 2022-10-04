@@ -105,7 +105,7 @@ echo "# empty" > "$HOME/.zshrc"
 
 echo ""
 echo "#########################################################################"
-cat $HOME/.config/commands.txt
+cat "$HOME/hhb/helper/commands.txt"
 echo "#########################################################################"
 
 # Installing reconftw results in wired version issues
