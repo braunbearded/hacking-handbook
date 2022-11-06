@@ -12,6 +12,7 @@
 - run programs which are in unusual places, maybe there is a bug
 - check application dir for configs, enviroments and other important files
 - check if you are in an container (lxc, docker)
+- check if other exploits with lower or higher version number works
 
 # CVE
 
@@ -24,10 +25,11 @@
 - udp
 - adjust scan speed espeacialy when running a udp scan
 
-# bruteforce/discovery
+# bruteforce/discovery/cracking
 
 - create custom wordlists with stuff like users, shares, company jargon and cewl
 - bruteforce/discover every service with your custom wordlist
+- crack hashes offline and online (with sth etc)
 
 # shares/ftp
 

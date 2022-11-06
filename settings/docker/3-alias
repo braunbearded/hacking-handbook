@@ -16,10 +16,12 @@ alias rrm="rm -r"
 alias cssh="ssh -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null"
 alias ghi="/home/kali/hhb/helper/ghidra.py --temp"
 alias ftpserver="/home/kali/hhb/helper/ftpserver.sh"
-alias share="/home/kali/hhb/helper/webserver.py"
-alias pel="cat /home/kali/hhb/helper/ollinux.txt"
-alias pew="cat /home/kali/hhb/helper/ol-win-local.txt"
+alias share="sudo /home/kali/hhb/helper/webserver.py"
+alias pel="cat /home/kali/hhb/linux/1-linux.txt"
+alias pew="cat /home/kali/hhb/windows/1-win.txt"
 alias sudo='sudo '
+alias comb="/home/kali/hhb/helper/combine-wordlists.py"
+alias rdp="remmina > /dev/null 2>&1 &"
 
 # Edit COmmand
 eco() {
@@ -44,7 +46,7 @@ ehi() {
 cef() {
   dest="$1"
   [ "$1" = "" ] && dest="$(pwd)"
-  files="$({ find /opt/external -not -iwholename '*.git*' -type f; cat "$HOME/hhb/helper/files.txt"; } | fzf -m)"
+  files="$({ find /opt/external -not -iwholename '*.git*' -type f; cat "$HOME/hhb/helper/files.txt"; find /usr/share/windows-binaries/ -type f -iname "*.exe"; } | fzf -m)"
   echo "$files" | while read -r f; do
     if [ -f "$f" ]; then
       file_name="$(basename "$f")"
@@ -98,8 +100,8 @@ dcu() {
       echo "curl \"http://$address:$port/$f\" -outputfile $file_name"
       echo "wget http://$address:$port/$f -outputfile $file_name"
       echo "Invoke-WebRequest -Uri http://$address:$port/$f -OutFile '$file_name'"
-      echo "Copy-Item -Source \\\\$address\\kali\\$f -Destination '$file_name'"
-      echo "copy \\\\$address\\kali\\$f $file_name"
+      printf 'Copy-Item -Source \\\\%s\\kali\\%s -Destination "%s"\n' "$address" "$f" "$file_name"
+      printf 'copy \\\\%s\\kali\\%s %s\n' "$address" "$f" "$file_name"
     fi
     if [ "$1" = "lin" ]; then
       echo "wget \"http://$address:$port/$f\""
@@ -161,13 +163,22 @@ pst() {
   #mkdir -p "nmap-$1" && rustscan -a "$1" -- -A -sC -sV -sS -sU --osscan-guess --version-all -oA "nmap-$1/fullscan-tcp"
 }
 
-# Port Scan Udp
-psu() {
-  [ "$1" = "" ] && echo "Usage: psu <ip>" && return
+# Port Scan Udp Fast
+psuf() {
+  [ "$1" = "" ] && echo "Usage: psuf <ip>" && return
   echo "Executing the following command and copied to clipboard:"
   echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --max-retries 1 --max-scan-delay 1 --version-intensity 0 -oA nmap-$rhost/top1000-udp $1"
   echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --max-retries 1 --max-scan-delay 1 --version-intensity 0 -oA nmap-$rhost/top1000-udp $1" | xclip -selection clipboard
   mkdir -p "nmap-$1" && nmap -v -Pn -sU --max-retries 1 --max-scan-delay 1 --version-intensity 0 -oA "nmap-$rhost/top1000-udp" "$1"
+}
+
+# Port Scan Udp
+psu() {
+  [ "$1" = "" ] && echo "Usage: psu <ip>" && return
+  echo "Executing the following command and copied to clipboard:"
+  echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --top-ports 100 -oA nmap-$rhost/top100slow-udp $1"
+  echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --top-ports 100 -oA nmap-$rhost/top100slow-udp $1" | xclip -selection clipboard
+  mkdir -p "nmap-$1" && nmap -v -Pn -sU --top-ports 100 -oA "nmap-$rhost/top100slow-udp" "$1"
 }
 
 # NIKto
@@ -223,9 +234,9 @@ ffr() {
   shift; shift;
   ffuf_out="ffuf-${proto}-${request_file}"
   echo "Executing and copied to clipboard:"
-  echo "ffuf -c -u -request \"${request_file}\" -request-proto \"${proto}\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' -H \"Host: ${ressource}\" $@"
-  echo "ffuf -c -u -request \"${request_file}\" -request-proto \"${proto}\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' -H \"Host: ${ressource}\" $@" | xclip
-  ffuf -c -u -request "${request_file}" -request-proto "${proto}" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o "'$ffuf_out/summary.json'" -recursion -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od "'$ffuf_out'" -mc '200,204,301,302,307,401,405,403' -H "Host: ${ressource}" $@
+  echo "ffuf -c -request \"${request_file}\" -request-proto \"${proto}\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' $@"
+  echo "ffuf -c -request \"${request_file}\" -request-proto \"${proto}\" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o '$ffuf_out/summary.json' -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od '$ffuf_out' -mc '200,204,301,302,307,401,405,403' $@" | xclip
+  ffuf -c -request "${request_file}" -request-proto "${proto}" -w /usr/share/seclists/Discovery/Web-Content/raft-small-words-lowercase.txt -o "$ffuf_out/summary.json" -e '/,.htm,.py,.sh,.php,.txt,.md,.html,.asp,.aspx,.jsp' -od "$ffuf_out" -mc '200,204,301,302,307,401,405,403' $@
 }
 
 # FFuf Directory
@@ -329,7 +340,7 @@ ssmbserver() {
 
 # Search Hacking Book
 shb() {
-  repo_path="/opt/repos/hacking-handbook"
+  repo_path="/home/kali/hhb"
   search="$1"
   [ "$search" = "" ] && search=".*"
   [ "$2" = "stdout" ] && rg "$search" "$repo_path" && return
@@ -377,7 +388,10 @@ crh() {
   [ "$1" = "" ] && echo "Usage: cha <path to file with hash>" && return
   nth --no-banner --file "$1"
   echo "Crack with hashcat:"
-  echo "hashcat \"$1\" /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt"
+  echo "mode=1000"
+  echo "hashcat -m \$mode \"$1\" /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt"
+  echo "hashcat -m \$mode \"$1\" /usr/share/seclists/Passwords/Leaked-Databases/rockyou.txt" | xclip -selection clipboard
+  echo "Command copied to clipboard!"
 }
 
 enumsmb() {
@@ -417,7 +431,7 @@ enumsmb() {
 	echo "########### Running: enum4linux-ng.py -a \"$1\" ###########"
 	enum4linux-ng.py -A "$1"
 	echo "########### Running: nmap --script \"smb-enum* or smb-vuln*\" -Pn -p 139,445 \"$1\" ###########"
-	nmap --script "smb-enum* or smb-vuln*" -Pn -p 139,445 "$1"
+	sudo nmap --script "smb-enum* or smb-vuln*" -Pn -p 139,445 "$1"
 	if [ ! "$2" = "" ]; then
 		echo "########### Running: impacket-GetADUsers -dc-ip \"$1\" \"$2/\" -all ###########"
 		impacket-GetADUsers -dc-ip "$1" "$2/" -all
@@ -460,4 +474,18 @@ msfc() {
     sudo service postgresql start
   fi
   msfconsole -q
+}
+
+# PortScan Search
+pss() {
+  selected="$(find /usr/share/nmap/scripts -type f -exec basename {} '.nse' \; | sort | fzf)"
+  [ "$selected" = "" ] && return
+  echo "Run nmap with script as follows:"
+  echo "ports='1,2,3'"
+  echo "nmap -Pn -v --script \""$selected"\" -p \"\$ports\" \"\$rhost\""
+  if [ ! "$(echo "$selected" | grep -o "-")" == "" ]; then
+    split="$(echo "$selected" | cut -d "-" -f 1)"
+    echo "or with wildcard:"
+    echo "nmap -Pn -v --script \""${split}-*"\" -p \"\$ports\" \"\$rhost\""
+  fi
 }

