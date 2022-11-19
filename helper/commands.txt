@@ -14,6 +14,7 @@ e                        # open nvim
 eco                      # read string vom stdin; edit in $EDITOR; run 
 eeh                      # edit /etc/hosts
 ehi                      # edit command from history and run
+enumftp                  # enumerate ftp server
 enumsmb                  # enumerate smb server
 eur                      # url encode
 eurs                     # url encode with slash
@@ -31,6 +32,7 @@ md                       # mkdir with parent
 msfc                     # start msfconsole with postgres
 ncl                      # netcat listen
 nik                      # nikto scan
+pco                      # show this list
 pel                      # print linux commands for enumeration
 pew                      # print windows commands for enumeration
 phpwebsh                 # print php webshell
@@ -40,7 +42,6 @@ psu                      # udp port scan
 psuf                     # udp port scan fast
 pve                      # create and switch to python virtual env
 rrm                      # rm recursively
-sco                      # show this list
 share                    # start python webserver
 shb                      # search in hacking handbook
 smbserver                # start impacket smbserver

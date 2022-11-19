@@ -4,7 +4,7 @@ alias ff="firefox > /dev/null 2> /dev/null &"
 alias zaproxy="zaproxy > /dev/null 2> /dev/null &"
 alias eeh="sudoedit /etc/hosts" # Edit /Etc/Host
 alias genssh="ssh-keygen -f id_rsa -P ''"
-alias sco="cat /home/kali/hhb/helper/commands.txt" # Search COmmands
+alias pco="cat /home/kali/hhb/helper/commands.txt" # Print COmmands
 alias e="nvim"
 alias f="ranger"
 alias history="history 0"
@@ -19,6 +19,7 @@ alias ftpserver="/home/kali/hhb/helper/ftpserver.sh"
 alias share="sudo /home/kali/hhb/helper/webserver.py"
 alias pel="cat /home/kali/hhb/linux/1-linux.txt"
 alias pew="cat /home/kali/hhb/windows/1-win.txt"
+alias pee="cat /home/kali/hhb/general/1-enum.txt"
 alias sudo='sudo '
 alias comb="/home/kali/hhb/helper/combine-wordlists.py"
 alias rdp="remmina > /dev/null 2>&1 &"
@@ -131,7 +132,8 @@ dcus() {
 ncl() {
   port="5555"
   [ "$1" != "" ] && port="$1"
-  sudo nc -nlvp "$port"
+  [ "$2" = "w" ] && sudo rlwarp nc -nlvp "$port"
+  [ "$2" != "w" ] && sudo nc -nlvp "$port"
 }
 
 phpwebsh() {
@@ -174,11 +176,13 @@ psuf() {
 
 # Port Scan Udp
 psu() {
-  [ "$1" = "" ] && echo "Usage: psu <ip>" && return
+  [ "$1" = "" ] && echo "Usage: psu <ip> [number of top ports to scan]" && return
+  num_ports=100
+  [ ! "$2" = "" ] && num_ports="$2"
   echo "Executing the following command and copied to clipboard:"
-  echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --top-ports 100 -oA nmap-$rhost/top100slow-udp $1"
-  echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --top-ports 100 -oA nmap-$rhost/top100slow-udp $1" | xclip -selection clipboard
-  mkdir -p "nmap-$1" && nmap -v -Pn -sU --top-ports 100 -oA "nmap-$rhost/top100slow-udp" "$1"
+  echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --top-ports $num_ports -oA nmap-$rhost/top${num_ports}slow-udp $1"
+  echo "mkdir -p nmap-$1 && nmap -v -Pn -sU --top-ports $num_ports -oA nmap-$rhost/top${num_ports}slow-udp $1" | xclip -selection clipboard
+  mkdir -p "nmap-$1" && nmap -v -Pn -sU --top-ports $num_ports -oA "nmap-$rhost/top${num_ports}slow-udp" "$1"
 }
 
 # NIKto
@@ -198,7 +202,7 @@ srh() {
 
 # FFuf Web bruteforce
 ffw() {
-  [ "$3" = "" ] && echo "Usage: ffw <http/https> <domain/ip> <:port/dir> [other ffuf params]" && return
+  [ "$2" = "" ] && echo "Usage: ffw <http/https> <domain/ip> [:port/dir>] [other ffuf params]" && return
   proto="$1"
   ressource="$2"
   port="$3"
@@ -377,10 +381,18 @@ chi() {
 
 # Python Virtual Env
 pve() {
-  [ "$1" = "" ] && echo "Usage: pve <virtual env name>" && return
-  python3 -m venv "$1"
-  . "$1/bin/activate"
-  echo 'Run "deactivate" to exit virtual env'
+  [ "$1" = "" ] && echo "Usage: pve <virtual env name> [version(2,3)]" && return
+  if [ "$version" = "" -o "$version" = "3" ]; then
+    python3 -m venv "$1"
+    . "$1/bin/activate"
+    echo 'Run "deactivate" to exit virtual env'
+  elif [ "$version" = "2" ]; then
+    python3 -m virtualenv -p "$(which python2)" "$1"
+    . "$1/bin/activate"
+    echo 'Run "deactivate" to exit virtual env'
+  else 
+  echo "Usage: pve <virtual env name> [version(2,3)]"
+  fi
 }
 
 # CRack Hash
@@ -394,7 +406,25 @@ crh() {
   echo "Command copied to clipboard!"
 }
 
-enumsmb() {
+enumerateftp() {
+	[ "$1" = "" ] && echo "Usage: enumftp <ip> [port]" && return
+	port=21
+	[ ! "$2" = "" ] && port="$2"
+	users=",nobody,admin,administrator,root,guest,null,anonymous"
+	echo "$users" | tr "," "\n" | xargs -I '{}' sh -c \
+	  "echo \"########### Running: lftp -e 'ls' -u {},'' ftp://$1:$2 ###########\"; \
+	  lftp -e 'ls' -u {},'' ftp://$1:$2; \
+	  echo \"########### Running: lftp -e 'ls' -u {},{} ftp://$1:$2 ###########\"; \
+	  lftp -e 'ls' -u {},{} ftp://$1:$2"
+	echo "########### Running: 	sudo nmap --script \"ftp*\" -Pn -p \"$port\" \"$1\" ###########"
+	sudo nmap --script "ftp*" -Pn -p "$port" "$1"
+}
+
+enumftp() {
+  enumerateftp "$@" | tee enumftp.txt
+}
+
+enumeratesmb() {
 	[ "$1" = "" ] && echo "Usage: enumsmb <ip> [domain]" && return
 	users=",nobody,admin,administrator,root,guest,null,anonymous"
 	echo "########### Running: nbtscan \"$1\" ###########"
@@ -443,6 +473,10 @@ enumsmb() {
 	echo "########### Auto Enum down ###########"
 	echo "Do you want to bruteforce via SMB?"
 	echo "crackmapexec smb \"$1\" -u pot-user.txt -p pot-passwords.txt --continue-on-success"
+}
+
+enumsmb() {
+  enumeratesmb "$@" | tee enumsmb.txt
 }
 
 # BloodHound

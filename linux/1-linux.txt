@@ -1,8 +1,8 @@
 # os
-uname -a && cat /etc/*-release && cat /etc/issue && cat /proc/version
+uname -a; cat /etc/*-release /etc/issue /proc/version
 ps -auxefww --forest
 dpkg -l
-cat /etc/fstab && mount && lsblk
+cat /etc/fstab; mount; lsblk
 env
 lsmod
 /sbin/modinfo <kernel mod>
@@ -10,15 +10,16 @@ lsmod
 # files
 find / -perm /4000 2>/dev/null
 find / -writable -type d 2>/dev/null
-ls -la /etc/passwd /etc/shadow && cat /etc/passwd
+ls -la /etc/passwd /etc/shadow; cat /etc/passwd
 ls -la /opt /srv /home
-ls -lah /etc/cron* && cat /etc/crontab
+ls -lah /etc/cron*; cat /etc/crontab
 find / -iname network-secret.txt 2>/dev/null
 
 # network
 netstat -tulpn || ss -tulpn
+iptales -S
 hostname
-ip a && ip route show
+ip a; ip route show
 /sbin/route
 cat /etc/iptables
 tcpdump -i tun0 icmp
@@ -27,7 +28,7 @@ sudo proxychains nmap -v -sT -Pn --top-ports 1000 "$rhost"
 
 # user
 sudo -l
-id && whoami && groups
+id; whoami; groups
 
 # helper
 openssl passwd -1 -salt ignite pass

