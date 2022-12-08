@@ -15,6 +15,7 @@ eco                      # read string vom stdin; edit in $EDITOR; run
 eeh                      # edit /etc/hosts
 ehi                      # edit command from history and run
 enumftp                  # enumerate ftp server
+enumldap                 # enumerate ldap
 enumsmb                  # enumerate smb server
 eur                      # url encode
 eurs                     # url encode with slash
@@ -52,4 +53,5 @@ update_external_tools    # update external tools in /opt/external
 update_repos             # update repos in /opt/repos
 vnc_start               
 vnc_stop                
+winremoteexec            # try different windows remote protocols
 zaproxy                  # open zaproxy

