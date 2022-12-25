@@ -7,41 +7,42 @@ import sys
 import netifaces as ni
 
 IP = "0.0.0.0"
-PORT = 8000 # default
+PORT = 8000  # default
 
 if len(sys.argv) >= 2:
     PORT = int(sys.argv[1])
 
 if len(sys.argv) >= 3:
-    IP = ni.ifaddresses(sys.argv[2])[ni.AF_INET][0]['addr']
+    IP = ni.ifaddresses(sys.argv[2])[ni.AF_INET][0]["addr"]
 
-class GetHandler(
-        SimpleHTTPServer.SimpleHTTPRequestHandler
-        ):
 
+class GetHandler(SimpleHTTPServer.SimpleHTTPRequestHandler):
     def do_GET(self):
-        print("+++++++++++++++++++++++++++++++++REQUEST START++++++++++++++++++++++++++++++++++")
+        print(
+            "+++++++++++++++++++++++++++++++++REQUEST START++++++++++++++++++++++++++++++++++"
+        )
         print(self.headers)
-        print("+++++++++++++++++++++++++++++++++REQUEST END++++++++++++++++++++++++++++++++++++")
+        print(
+            "+++++++++++++++++++++++++++++++++REQUEST END++++++++++++++++++++++++++++++++++++"
+        )
         SimpleHTTPServer.SimpleHTTPRequestHandler.do_GET(self)
 
 
-Handler = GetHandler
-with SocketServer.TCPServer(("", PORT), Handler) as httpd:
+with SocketServer.TCPServer(("", PORT), GetHandler) as httpd:
     print(f"Server on listen on {PORT}")
     print(f"Visit: http://{IP}:{PORT}/")
     httpd.serve_forever()
 
 # TODO
 # taken from https://gist.github.com/bradmontgomery/2219997
-#from http.server import BaseHTTPRequestHandler, HTTPServer
-#import logging
-#import sys
+# from http.server import BaseHTTPRequestHandler, HTTPServer
+# import logging
+# import sys
 #
-#COLOR = "\033[1;32m"
-#RESET_COLOR = "\033[00m"
+# COLOR = "\033[1;32m"
+# RESET_COLOR = "\033[00m"
 #
-#class S(BaseHTTPRequestHandler):
+# class S(BaseHTTPRequestHandler):
 #    def _set_response(self):
 #        self.send_response(200)
 #        self.send_header('Content-type', 'text/html')
@@ -68,7 +69,7 @@ with SocketServer.TCPServer(("", PORT), Handler) as httpd:
 #    def do_DELETE(self):
 #        self.do_log("DELETE")
 #
-#def run(address, port, server_class=HTTPServer, handler_class=S):
+# def run(address, port, server_class=HTTPServer, handler_class=S):
 #    logging.basicConfig(level=logging.INFO)
 #    server_address = (address, port)
 #    httpd = server_class(server_address, handler_class)
@@ -80,7 +81,7 @@ with SocketServer.TCPServer(("", PORT), Handler) as httpd:
 #    httpd.server_close()
 #    logging.info('Stopping httpd...\n')
 #
-#if __name__ == '__main__':
+# if __name__ == '__main__':
 #    if len(sys.argv) != 3:
 #        print("Usage:\n" + sys.argv[0] + " [address] [port]")
 #        sys.exit(1)

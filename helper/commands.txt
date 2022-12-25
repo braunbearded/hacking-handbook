@@ -27,6 +27,7 @@ ffw                      # default web discovery
 ftpserver                # python ftpserver
 genssh                   # generate ssh keys
 ghi                      # analyse binary in background with ghidra
+httpverb                 # test different http verbs
 interfaceip              # get main interface ip
 lsa                      # long listing
 md                       # mkdir with parent
@@ -42,9 +43,12 @@ pst                      # tcp port scan
 psu                      # udp port scan
 psuf                     # udp port scan fast
 pve                      # create and switch to python virtual env
+pwl                      # print wordlists
 rrm                      # rm recursively
 share                    # start python webserver
 shb                      # search in hacking handbook
+shbf                     # search in hacking handbook print wwhole file
+shbs                     # search in hacking handbook print to stdout
 smbserver                # start impacket smbserver
 sp                       # searchsploit with fzf
 srh                      # export rhost

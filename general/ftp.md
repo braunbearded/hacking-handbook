@@ -22,9 +22,14 @@ lftp -u <user> $rhost
 mirror # download all files
 ```
 
+```bash
+wget -r --no-passive-ftp ftp://user:password@$rhost
+```
+
 ## download with active/passiv mode
 
 ```bash
 lftp ftp://<user>@"$rhost"
 set ftp:passive-mode off
 ```
+

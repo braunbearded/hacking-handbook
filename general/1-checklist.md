@@ -57,6 +57,7 @@
     - virtual hosts
     - generate wordlist with cewl
 - check for sqli/nosqli
+- does the site contains any relevant infos (e.g. domains) -> use this for registing users or any other functionality
 - check vhost
 - check ssl
 - read files via iframe: <iframe src='/root/.ssh/id_rsa'>
@@ -65,7 +66,7 @@
 - check if templating engine is used
 - check the size of every valid response
 - check every url, param, input field, post request
-- check for command injection, ssrf, xss, lfi (e.g. localhost), rfi, path traversal, xxe
+- check for command injection, ssrf, xss, lfi (e.g. localhost), rfi, path traversal, xxe, xpath
 - check for predictable ids
 - check if the webserver is connected to any other service
 - check if different proxys are used

