@@ -3,15 +3,20 @@
 # Do your user specific stuff like overriding env variables here
 
 # Nvchad
+#if [ ! -d "$HOME/.config/nvim" ]; then
+#  git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1
+#  mkdir -p ~/.config/nvim/lua/custom
+#  echo "vim.opt.relativenumber = true" > ~/.config/nvim/lua/custom/init.lua
+#fi
+
+# Astrovim
 if [ ! -d "$HOME/.config/nvim" ]; then
-  git clone https://github.com/NvChad/NvChad ~/.config/nvim --depth 1
-  mkdir -p ~/.config/nvim/lua/custom
-  echo "vim.opt.relativenumber = true" > ~/.config/nvim/lua/custom/init.lua
+	git clone --depth 1 https://github.com/AstroNvim/AstroNvim ~/.config/nvim
+	sudo npm install -g neovim
 fi
 
-
 if [ ! -d "$HOME/hack/history" ]; then
-  mkdir -p "$HOME/hack/history"
+	mkdir -p "$HOME/hack/history"
 fi
 
 # lunarvim
@@ -89,19 +94,19 @@ fi
 #fi
 
 #npm list --depth 1 -g neovim > /dev/null || npm install -g neovim
-pip3 show pynvim > /dev/null || sudo python3 -m pip install pynvim
+#pip3 show pynvim > /dev/null || sudo python3 -m pip install pynvim
 
 # install prettier lsd
-if ! command -v lsd > /dev/null; then
-  wget -O /tmp/lsd.deb "$(curl -s https://api.github.com/repos/Peltoche/lsd/releases/latest | jq -r '.assets[].browser_download_url' | grep 'lsd_.*amd64')" 
-  sudo apt install /tmp/lsd.deb 
-  rm /tmp/lsd.deb
+if ! command -v lsd >/dev/null; then
+	wget -O /tmp/lsd.deb "$(curl -s https://api.github.com/repos/lsd-rs/lsd/releases/latest | jq -r '.assets[].browser_download_url' | grep 'lsd_.*amd64')"
+	sudo apt install /tmp/lsd.deb
+	rm /tmp/lsd.deb
 fi
 
 # get ranger conf
-[ ! -f "$HOME/.config/ranger/rc.conf" ] && mkdir -p "$HOME/.config/ranger/" && curl https://gist.githubusercontent.com/braunbearded/de021eda8704ccc98c19e12a15d57ca8/raw/c0b374b0c23582acda72d0a0b4cc5cbfd7a8729e/rc.conf > "$HOME/.config/ranger/rc.conf"
+[ ! -f "$HOME/.config/ranger/rc.conf" ] && mkdir -p "$HOME/.config/ranger/" && curl https://gist.githubusercontent.com/braunbearded/de021eda8704ccc98c19e12a15d57ca8/raw/c0b374b0c23582acda72d0a0b4cc5cbfd7a8729e/rc.conf >"$HOME/.config/ranger/rc.conf"
 
-echo "# empty" > "$HOME/.zshrc"
+echo "# empty" >"$HOME/.zshrc"
 
 echo ""
 echo "#########################################################################"
@@ -116,4 +121,3 @@ echo "#########################################################################"
 #    ./install.sh
 #    cd "$HOME"
 #fi
-
