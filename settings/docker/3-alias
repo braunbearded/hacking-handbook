@@ -685,3 +685,18 @@ rdp() {
 	#remmina $@ >/dev/null 2>/dev/null &
 	xfreerdp /sec:tls /u: /v:$@
 }
+
+sshserver() {
+	ssh_key_file="$1"
+	if [ ! -f "$ssh_key_file" ]; then
+		[ ! -f ./sshserver_rsa_key ] && ssh-keygen -t rsa -b 4096 -C 'sshserver' -f sshserver_rsa_key -N ""
+		ssh_key_file="sshserver_rsa_key"
+	fi
+
+	port="$2"
+	[ "$port" = "" ] && port="22"
+
+	echo "Starting ssh server on port 22"
+
+	sudo /home/kali/hhb/helper/sshserver.py "$ssh_key_file" "$port"
+}
