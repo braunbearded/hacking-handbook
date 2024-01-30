@@ -101,6 +101,7 @@ if ! command -v lsd >/dev/null; then
 	wget -O /tmp/lsd.deb "$(curl -s https://api.github.com/repos/lsd-rs/lsd/releases/latest | jq -r '.assets[].browser_download_url' | grep 'lsd_.*amd64')"
 	sudo apt install /tmp/lsd.deb
 	rm /tmp/lsd.deb
+	/home/kali/.pwndbg/setup.sh
 fi
 
 # get ranger conf
